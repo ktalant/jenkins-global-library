@@ -6,13 +6,6 @@ def jsonParse(def json) {
     new groovy.json.JsonSlurperClassic().parseText(json)
 }
 
-node('master') {
-    def config = jsonParse(readFile("config.json"))
-
-    def db = config["database"]["address"]
-    ...
-}
-
 
 def showUserInfor(jsonData) {
   def data = jsonParse(readFile(jsonData))

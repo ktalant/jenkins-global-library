@@ -19,9 +19,9 @@ def result(data) {
     )
 
   resultData = jsonSlurper.parse(reader)
-  if (resultData.data) {
-    resultData.data.each() {
-      println("Users first name :${it['first_name']}, Last name :${it['last_name']}")
-    }
+  
+  resultData.data.each() {
+    println("Users first name :${it['first_name']}, Last name :${it['last_name']}")
   }
+
 }

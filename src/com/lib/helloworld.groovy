@@ -16,9 +16,9 @@ def result(data) {
   def jsonSlurper = new JsonSlurper()
   def reader = new BufferedReader(
   new InputStreamReader(
-    new FileInputStream(data),"UTF-8")
+    new FileInputStream("${workspace}/" + data),"UTF-8")
     )
-    
+
   resultData = jsonSlurper.parse(reader)
   if (resultData.data) {
     resultData.data.each() {

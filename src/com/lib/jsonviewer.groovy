@@ -9,7 +9,8 @@ def jsonParse(def json) {
 
 def showUserInfor(jsonData) {
   def data = jsonParse(readFile(jsonData))
-  data.each() {
-    println("Users first name :${it['first_name']}, Last name :${it['last_name']}")
-  }
+  println(data)
+  // data.each() {
+  //   println("Users first name :${it['first_name']}, Last name :${it['last_name']}")
+  // }
 }

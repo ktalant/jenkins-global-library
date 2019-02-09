@@ -3,7 +3,7 @@ import groovy.json.JsonSlurperClassic
 
 @NonCPS
 def jsonParse(def json) {
-    new groovy.json.JsonSlurperClassic().parseText(json)
+    new groovy.json.JsonSlurperClassic().parse(json)
 }
 
 

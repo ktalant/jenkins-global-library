@@ -3,20 +3,16 @@ package com.lib
 
 import groovy.json.*
 
-
-
 def hello() {
   println("Hello World")
 }
-
-
 
 def result(data) {
 
   def jsonSlurper = new JsonSlurper()
   def reader = new BufferedReader(
   new InputStreamReader(
-    new FileInputStream("${workspace}/" + data),"UTF-8")
+    new FileInputStream(data),"UTF-8")
     )
 
   resultData = jsonSlurper.parse(reader)

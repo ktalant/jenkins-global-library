@@ -22,8 +22,11 @@ def runPipeline() {
   }
 
   node('master') {
-    properties([
-    parameters([ choice(name: 'CHOICE', choices: [ environment, 'two', 'three'], description: 'Please select docker image to deploy!')])])
+    properties([ parameters(
+
+      [ choice(name: 'CHOICE', choices: [ findDockerImages('fuchicorp')], description: 'Please select docker image to deploy!')]
+
+      )])
       stage('check docker image') {
           echo "${WORKSPACE}"
       }

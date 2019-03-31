@@ -20,6 +20,8 @@ def runPipeline() {
   def repositoryName = "webplatform"
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
 
+  println("The branch name is: ${branch}")
+
   switch(branch) {
     case 'master':
     repositoryName + '-prod'

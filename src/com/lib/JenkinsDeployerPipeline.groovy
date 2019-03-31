@@ -2,7 +2,7 @@
 package com.lib
 
 
-def branchName = "${JOB_NAME}"
+def branchName = "${JOB_BASE_NAME}"
 
 def runPipeline() {
   println("${branchName}")

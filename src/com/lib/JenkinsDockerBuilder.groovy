@@ -54,7 +54,7 @@ def runPipeline() {
 
       // Get latest release from local git
       env.release = sh returnStdout: true, script: '''
-      git fetch --tags --force \ 
+      git fetch --tags --force 
       git describe --abbrev=0 --tags'''
     }
 

@@ -4,6 +4,15 @@ package com.lib
 
 def branchName = "${JOB_BASE_NAME}"
 
-def runPipeline() {
+
+
+
+def runPipeline(branchName) {
   println("${branchName}")
+}
+
+
+
+def generateVarsFile() {
+
 }

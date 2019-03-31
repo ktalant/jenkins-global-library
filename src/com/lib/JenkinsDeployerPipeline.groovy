@@ -7,12 +7,6 @@ def branchName = "${JOB_BASE_NAME}"
 
 
 
-def runPipeline(branchName) {
+def runPipeline(String branchName) {
   println("${branchName}")
-}
-
-
-
-def generateVarsFile() {
-
 }

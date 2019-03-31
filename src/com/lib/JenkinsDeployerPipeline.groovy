@@ -8,9 +8,12 @@ def runPipeline() {
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
 
   switch(branch) {
-    case 'master': environment = 'prod'
-    case 'qa': environment = 'qa'
-    case 'dev': environment = 'dev'
+    case 'master':
+    environment = 'prod'
+    case 'qa':
+    environment = 'qa'
+    case 'dev':
+    environment = 'dev'
     default:
         print('This branch does not supported')
 

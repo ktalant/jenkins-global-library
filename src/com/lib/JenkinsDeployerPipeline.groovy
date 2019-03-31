@@ -29,26 +29,26 @@ def runPipeline() {
     properties([ parameters([
       choice(name: 'Docker images', choices: findDockerImages("fuchicorp"), description: 'Please select docker image to deploy!'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply')
-      
+
       ]
       )])
 
       stage('Terraform init') {
-        dir('deployment/terraform') {
+        dir("${WORKSPACE}/deployment/terraform") {
           sh 'terraform init'
         }
       }
 
       if (terraformApply == true) {
         stage('Apply Changes') {
-          dir('deployment/terraform') {
+          dir("${WORKSPACE}/deployment/terraform") {
             sh 'terraform apply -var-file=webplatform.tfvars'
           }
         }
 
       } else {
         stage('Terraform Plan') {
-          dir('deployment/terraform') {
+          dir("${WORKSPACE}/deployment/terraform") {
             sh 'terraform plan'
           }
         }

@@ -53,7 +53,9 @@ def runPipeline() {
     stage('New release GIT') {
 
       // Get latest release from local git
-      env.release = sh returnStdout: true, script: 'git describe --abbrev=0 --tags'
+      env.release = sh returnStdout: true, script: '''
+      git fetch --tags --force \ 
+      git describe --abbrev=0 --tags'''
     }
 
     if (!commonDeployer.findDockerImages(branch).contains(env.release)) {

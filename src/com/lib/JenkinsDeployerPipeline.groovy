@@ -8,27 +8,22 @@ def runPipeline() {
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
 
   switch(branch) {
-    case 'master':
-    environment = 'prod'
-
-    case 'qa':
-    environment = 'qa'
-
-    case 'dev':
-    environment = 'dev'
-
+    case 'master': environment = 'prod'
+    case 'qa': environment = 'qa'
+    case 'dev': environment = 'dev'
     default:
         print('This branch does not supported')
+
   }
 
   node('master') {
-    properties([ parameters(
-
-      [ choice(name: 'CHOICE', choices: findDockerImages('fuchicorp'), description: 'Please select docker image to deploy!')]
-
+    properties([
+      parameters(
+        [ choice(name: 'Docker images', choices: findDockerImages(branch), description: 'Please select docker image to deploy!')]
       )])
+
       stage('check docker image') {
-          echo "${WORKSPACE}"
+
       }
   }
 }

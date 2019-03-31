@@ -30,9 +30,11 @@ def runPipeline() {
     case 'qa':
     repositoryName = repositoryName +  '-qa'
     break
+
     case 'dev':
     repositoryName = repositoryName + '-dev'
     break
+    
     default:
         repositoryName = null
         currentBuild.result = 'FAILURE'

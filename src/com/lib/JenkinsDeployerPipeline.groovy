@@ -19,21 +19,41 @@ def runPipeline() {
     case 'dev':
     environment = 'dev'
     break
-    
+
     default:
         currentBuild.result = 'FAILURE'
         print('This branch does not supported')
   }
 
   node('master') {
-    properties([ parameters(
-
-      [ choice(name: 'Docker images', choices: findDockerImages("fuchicorp"), description: 'Please select docker image to deploy!')]
-
+    properties([ parameters([
+      choice(name: 'Docker images', choices: findDockerImages("fuchicorp"), description: 'Please select docker image to deploy!'),
+      booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply')
+      
+      ]
       )])
-      stage('check docker image') {
-          echo "${WORKSPACE}"
+
+      stage('Terraform init') {
+        dir('deployment/terraform') {
+          sh 'terraform init'
+        }
       }
+
+      if (terraformApply == true) {
+        stage('Apply Changes') {
+          dir('deployment/terraform') {
+            sh 'terraform apply -var-file=webplatform.tfvars'
+          }
+        }
+
+      } else {
+        stage('Terraform Plan') {
+          dir('deployment/terraform') {
+            sh 'terraform plan'
+          }
+        }
+      }
+
   }
 }
 

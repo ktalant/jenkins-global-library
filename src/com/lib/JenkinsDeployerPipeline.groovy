@@ -18,6 +18,7 @@ def runPipeline() {
     environment = 'dev'
 
     default:
+        currentBuild.result = 'FAILURE'
         print('This branch does not supported')
   }
 
@@ -32,9 +33,6 @@ def runPipeline() {
       }
   }
 }
-
-
-
 
 def findDockerImages(branchName) {
 

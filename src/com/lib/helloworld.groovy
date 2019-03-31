@@ -1,10 +1,9 @@
 #!/usr/bin/env groovy
 package com.lib
 
+def branchName = ${JOB_NAME}
 
-def hello() {
-  println("Hello World")
+
+def runPipeline() {
+  println("${branchName}")
 }
-
-
-return this

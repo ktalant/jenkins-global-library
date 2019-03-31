@@ -22,13 +22,13 @@ def runPipeline() {
 
   switch(branch) {
     case 'master':
-    repositoryName = repositoryName + '-prod'
+    repositoryName + '-prod'
 
     case 'qa':
-    repositoryName = repositoryName + '-qa'
+    repositoryName +  '-qa'
 
     case 'dev':
-    repositoryName = repositoryName + '-dev'
+    repositoryName + '-dev'
 
     default:
         repositoryName = null
@@ -54,7 +54,7 @@ def runPipeline() {
 
       // Get latest release from local git
       env.release = sh returnStdout: true, script: '''
-      git fetch --tags --force 
+      git fetch --tags --force
       git describe --abbrev=0 --tags'''
     }
 

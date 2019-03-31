@@ -4,22 +4,33 @@ import groovy.json.JsonSlurper
 
 def runPipeline() {
 
+  def environment = ""
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
 
   switch(branch) {
     case 'master':
-    println('This will go to prod')
+    environment = 'prod'
 
     case 'qa':
-    println('This will go to qa')
+    environment = 'qa'
 
     case 'dev':
-    println('This will go to qa')
+    environment = 'dev'
 
     default:
         print('This branch does not supported')
   }
+
+  node('master') {
+    properties([
+    parameters([ choice(name: 'CHOICE', choices: [, 'two', 'three'], description: 'Please select docker image to deploy!')])])
+      stage('check docker image') {
+          echo "${WORKSPACE}"
+      }
+  }
 }
+
+
 
 
 def findDockerImages(branchName) {

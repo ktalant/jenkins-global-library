@@ -20,18 +20,19 @@ def runPipeline() {
   def repositoryName = "webplatform"
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
 
-  println("The branch name is: ${branch}")
+  echo "The branch name is: ${branch}"
 
   switch(branch) {
     case 'master':
-    repositoryName + '-prod'
+    repositoryName = repositoryName + '-prod'
+    break
 
     case 'qa':
-    repositoryName +  '-qa'
-
+    repositoryName = repositoryName +  '-qa'
+    break
     case 'dev':
-    repositoryName + '-dev'
-
+    repositoryName = repositoryName + '-dev'
+    break
     default:
         repositoryName = null
         currentBuild.result = 'FAILURE'

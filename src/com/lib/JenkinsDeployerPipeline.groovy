@@ -10,13 +10,16 @@ def runPipeline() {
   switch(branch) {
     case 'master':
     environment = 'prod'
+    break
 
     case 'qa':
     environment = 'qa'
+    break
 
     case 'dev':
     environment = 'dev'
-
+    break
+    
     default:
         currentBuild.result = 'FAILURE'
         print('This branch does not supported')

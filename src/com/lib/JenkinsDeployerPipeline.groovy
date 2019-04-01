@@ -8,16 +8,13 @@ def runPipeline() {
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
 
   switch(branch) {
-    case 'master':
-    environment = 'prod'
+    case 'master': environment = 'prod'
     break
 
-    case 'qa':
-    environment = 'qa'
+    case 'qa': environment = 'qa'
     break
 
-    case 'dev':
-    environment = 'dev'
+    case 'dev': environment = 'dev'
     break
 
     default:
@@ -50,7 +47,7 @@ def runPipeline() {
       } else {
         stage('Terraform Plan') {
           dir("${WORKSPACE}/deployment/terraform") {
-            sh "terraform plan"
+            sh "terraform plan -var-file=webplatform.tfvars"
           }
         }
       }

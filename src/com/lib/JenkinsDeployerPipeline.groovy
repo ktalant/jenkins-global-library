@@ -35,7 +35,6 @@ def runPipeline() {
       checkout scm
 
       stage('Terraform init') {
-        sh "ls ${WORKSPACE}"
         dir("${WORKSPACE}/deployment/terraform") {
           sh "terraform init"
         }

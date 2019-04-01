@@ -45,6 +45,7 @@ def runPipeline() {
 
       stage('Terraform init') {
         dir("${WORKSPACE}/deployment/terraform") {
+          sh 'cat webplatform.tfvars'
           sh "terraform init"
         }
       }

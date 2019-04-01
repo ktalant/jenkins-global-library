@@ -65,7 +65,7 @@ def runPipeline() {
         }
       }
 
-      stage('Clean up ')
+      stage('Clean up ') { 
          sh "rm -rf ${WORKSPACE}/deployment/terraform"
       }
 

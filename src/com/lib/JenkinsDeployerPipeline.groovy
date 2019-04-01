@@ -33,6 +33,7 @@ def runPipeline() {
       )])
       checkout scm
       stage('Generate Vars') {
+        dir("${WORKSPACE}/deployment/terraform") {
         def file = new File('webplatform.tfvars')
         file.write """
         mysql_user              =  "${branch}"
@@ -41,7 +42,7 @@ def runPipeline() {
         webplatform_namespace   =  "${environment}"
         webplatform_image       =  "nexus.fuchicorp.com:8085${SelectedDockerImage}"
         """
-
+        }
       }
 
       stage('Terraform init') {

@@ -33,13 +33,13 @@ def runPipeline() {
       )])
       checkout scm
       stage('Generate Vars') {
-        sh """echo '
+        writeFile file: 'webplatform.tfvars', text: """
         mysql_user              =  "${branch}"
         mysql_database          =  "${mysql_database}"
         mysql_host              =  "webplatform-mysql"
         webplatform_namespace   =  "${environment}"
         webplatform_image       =  "nexus.fuchicorp.com:8085${SelectedDockerImage}"
-        ' > webplatform.tfvars """
+        """
 
       }
 

@@ -53,7 +53,7 @@ def runPipeline() {
       if (terraformApply) {
         stage('Apply Changes') {
           dir("${WORKSPACE}/deployment/terraform") {
-            sh "terraform apply -var-file=webplatform.tfvars"
+            sh "terraform apply  --auto-approve  -var-file=webplatform.tfvars"
           }
         }
 
@@ -65,7 +65,7 @@ def runPipeline() {
         }
       }
 
-      stage('Clean up ') { 
+      stage('Clean up ') {
          sh "rm -rf ${WORKSPACE}/deployment/terraform"
       }
 

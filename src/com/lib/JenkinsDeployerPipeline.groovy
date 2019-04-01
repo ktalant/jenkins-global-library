@@ -24,20 +24,21 @@ def runPipeline() {
 
   node('master') {
     properties([ parameters([
-      choice(name: 'Docker images', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
-      booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply')
+      choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
+      booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
+      string(name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name'),
+
 
       ]
       )])
       checkout scm
       stage('Generate Vars') {
         sh """echo '
-        mysql_user            =  "${branch}"
-        mysql_database        =  "dbwebplatform"
-        mysql_host            =  "webplatform-mysql"
-        mysql_secret_key      =  "7hiuawef89hweafbi8921klnau"
-        webplatform_namespace =  ""
-        webplatform_image     =  ""
+        mysql_user              =  "${branch}"
+        mysql_database          =  "${mysql_database}"
+        mysql_host              =  "webplatform-mysql"
+        webplatform_namespace   =  "${environment}"
+        webplatform_image       =  ""
         ' > webplatform.tfvars """
 
       }
@@ -74,7 +75,7 @@ def findDockerImages(branchName) {
 
   nexusData.items.each {
     if (it.name.contains(branchName)) {
-       versionList.add(it.version)
+       versionList.add(it.name + ':' + it.version)
     }
   }
   return versionList

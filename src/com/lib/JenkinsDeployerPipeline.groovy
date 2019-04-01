@@ -34,9 +34,10 @@ def runPipeline() {
       )])
 
       stage('Terraform init') {
+        sh "ls ${WORKSPACE}"
         dir("${WORKSPACE}/deployment/terraform") {
           sh """
-          ls -l 
+          ls -l
           terraform init"""
         }
       }

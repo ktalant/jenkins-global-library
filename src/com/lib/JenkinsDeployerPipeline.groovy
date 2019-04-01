@@ -26,7 +26,7 @@ def runPipeline() {
     properties([ parameters([
       choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
-      string(name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name'),
+      string(name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name')
 
 
       ]

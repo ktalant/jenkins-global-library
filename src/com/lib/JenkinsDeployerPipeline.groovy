@@ -37,23 +37,21 @@ def runPipeline() {
       stage('Terraform init') {
         sh "ls ${WORKSPACE}"
         dir("${WORKSPACE}/deployment/terraform") {
-          sh """
-          ls -l
-          terraform init"""
+          sh "terraform init"
         }
       }
 
       if (terraformApply == true) {
         stage('Apply Changes') {
           dir("${WORKSPACE}/deployment/terraform") {
-            sh 'terraform apply -var-file=webplatform.tfvars'
+            sh "terraform apply -var-file=webplatform.tfvars"
           }
         }
 
       } else {
         stage('Terraform Plan') {
           dir("${WORKSPACE}/deployment/terraform") {
-            sh 'terraform plan'
+            sh "terraform plan"
           }
         }
       }

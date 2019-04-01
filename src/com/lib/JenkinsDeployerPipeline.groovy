@@ -39,9 +39,8 @@ def runPipeline() {
         mysql_database          =  "${mysql_database}"
         mysql_host              =  "webplatform-mysql"
         webplatform_namespace   =  "${environment}"
-        webplatform_image       =  "nexus.fuchicorp.com:8085${SelectedDockerImage}"
+        webplatform_image       =  "nexus.fuchicorp.com:8085/${SelectedDockerImage}"
         """
-
       }
 
       stage('Terraform init') {

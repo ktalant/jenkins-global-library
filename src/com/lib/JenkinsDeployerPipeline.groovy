@@ -33,7 +33,7 @@ def runPipeline() {
       )])
       checkout scm
       stage('Generate Vars') {
-        writeFile file: 'webplatform.tfvars', text: """
+        writeFile file: 'webplatform.tfvars', text: readContent+"""
         mysql_user              =  "${branch}"
         mysql_database          =  "${mysql_database}"
         mysql_host              =  "webplatform-mysql"

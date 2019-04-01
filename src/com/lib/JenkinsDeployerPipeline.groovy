@@ -50,7 +50,7 @@ def runPipeline() {
         }
       }
 
-      if (terraformApply == true) {
+      if (terraformApply) {
         stage('Apply Changes') {
           dir("${WORKSPACE}/deployment/terraform") {
             sh "terraform apply -var-file=webplatform.tfvars"

@@ -24,10 +24,9 @@ def runPipeline() {
 
   node('master') {
     properties([ parameters([
-      choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
+      choice(defaultValue: "webplatform-${environment}", name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
       string(name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name')
-
 
       ]
       )])
@@ -45,15 +44,15 @@ def runPipeline() {
 
       stage('Terraform init') {
         dir("${WORKSPACE}/deployment/terraform") {
-          sh 'cat webplatform.tfvars'
           sh "terraform init"
         }
       }
 
-      if (terraformApply) {
+      if (terraformApply == true ) {
         stage('Apply Changes') {
           dir("${WORKSPACE}/deployment/terraform") {
             sh "terraform apply  --auto-approve  -var-file=webplatform.tfvars"
+            sh 'ls'
           }
         }
 
@@ -65,7 +64,7 @@ def runPipeline() {
         }
       }
 
-      stage('Clean up ') {
+      stage('Clean up') {
          sh "rm -rf ${WORKSPACE}/deployment/terraform"
       }
 

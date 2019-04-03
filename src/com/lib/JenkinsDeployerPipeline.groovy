@@ -6,7 +6,6 @@ def runPipeline() {
 
   def environment = ""
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
-  def dockerImages = findDockerImages(branch)
 
   switch(branch) {
     case 'master': environment = 'prod'
@@ -25,7 +24,7 @@ def runPipeline() {
 
   node('master') {
     properties([ parameters([
-      choice(defaultValue: "webplatform-${environment}", name: 'SelectedDockerImage', choices: "${dockerImages}", description: 'Please select docker image to deploy!'),
+      choice(defaultValue: "webplatform-${environment}", name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
       string(name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name')
 

@@ -84,8 +84,6 @@ def findDockerImages(branchName) {
   nexusData.items.each {
     if (it.name.contains(branchName)) {
        versionList.add(it.name + ':' + it.version)
-    } else {
-      versionList.add('NONE')
     }
   }
   return versionList

@@ -48,7 +48,7 @@ def runPipeline() {
         }
       }
 
-      if (terraformApply == true ) {
+      if (params.terraformApply) {
         stage('Apply Changes') {
           dir("${WORKSPACE}/deployment/terraform") {
             sh "terraform apply  --auto-approve  -var-file=webplatform.tfvars"
@@ -76,6 +76,7 @@ def findDockerImages(branchName) {
   def versionList = []
   def myJsonreader = new JsonSlurper()
   def nexusData = myJsonreader.parse(new URL("http://nexus.fuchicorp.com/service/rest/v1/components?repository=webplatform"))
+
   if (branchName.toLowerCase() == 'master') {
     branchName = 'prod'
   }
@@ -83,6 +84,8 @@ def findDockerImages(branchName) {
   nexusData.items.each {
     if (it.name.contains(branchName)) {
        versionList.add(it.name + ':' + it.version)
+    } else {
+      versionList.add('NONE')
     }
   }
   return versionList

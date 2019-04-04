@@ -24,7 +24,7 @@ def runPipeline() {
 
   node('master') {
     properties([ parameters([
-      choice(defaultValue: "webplatform-${environment}", name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
+      choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
       string(name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name')
 
@@ -64,9 +64,9 @@ def runPipeline() {
         }
       }
 
-      stage('Clean up') {
-         sh "rm -rf ${WORKSPACE}/deployment/terraform"
-      }
+      // stage('Clean up') {
+      //    sh "rm -rf ${WORKSPACE}/deployment/terraform"
+      // }
 
   }
 }
@@ -86,6 +86,7 @@ def findDockerImages(branchName) {
        versionList.add(it.name + ':' + it.version)
     }
   }
+
   return versionList
 }
 

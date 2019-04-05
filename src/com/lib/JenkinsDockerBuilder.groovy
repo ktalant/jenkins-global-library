@@ -82,6 +82,7 @@ def runPipeline() {
        stage('clean up') {
          sh "docker rmi nexus.fuchicorp.com:8085/${repositoryName}:${env.release}"
          sh "docker rmi nexus.fuchicorp.com:8085/${repositoryName}:latest "
+         sh "rm -rf ${WORKSPACE}/*"
        }
       }
     }

@@ -34,7 +34,7 @@ def runPipeline() {
     case 'dev':
     repositoryName = repositoryName + '-dev'
     break
-    
+
     default:
         repositoryName = null
         currentBuild.result = 'FAILURE'
@@ -78,6 +78,9 @@ def runPipeline() {
               app.push("${env.release}")
               app.push("latest")
           }
+       }
+       stage('clean up') {
+         sh "docker rmi *${repositoryName}* --force"
        }
       }
     }

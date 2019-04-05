@@ -80,8 +80,8 @@ def runPipeline() {
           }
        }
        stage('clean up') {
-         sh "docker rmi http://nexus.fuchicorp.com:8085/${repositoryName}:${env.release} --force"
-         sh "docker rmi http://nexus.fuchicorp.com:8085/${repositoryName}:latest --force"
+         sh "docker rmi nexus.fuchicorp.com:8085/${repositoryName}:${env.release} --force"
+         sh "docker rmi nexus.fuchicorp.com:8085/${repositoryName}:latest --force"
        }
       }
     }

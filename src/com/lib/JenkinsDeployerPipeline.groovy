@@ -61,6 +61,7 @@ def runPipeline() {
               sh "terraform plan -var-file=webplatform.tfvars"
             }
         }
+      }
    }
 }
 

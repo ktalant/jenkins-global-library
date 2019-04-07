@@ -48,22 +48,20 @@ def runPipeline() {
         }
       }
 
-      if (params.terraformApply) {
-        stage('Apply Changes') {
+      stage('Terraform Apply/Plan') {
+        if (params.terraformApply) {
           dir("${WORKSPACE}/deployment/terraform") {
+            echo "##### Terraform Applying the Changes ####"
             sh "terraform apply  --auto-approve  -var-file=webplatform.tfvars"
             sh 'ls'
           }
+        } else {
+            dir("${WORKSPACE}/deployment/terraform") {
+              echo "##### Terraform Plan (Check) the Changes ####"
+              sh "terraform plan -var-file=webplatform.tfvars"
+            }
         }
-
-      } else {
-        stage('Terraform Plan') {
-          dir("${WORKSPACE}/deployment/terraform") {
-            sh "terraform plan -var-file=webplatform.tfvars"
-          }
-        }
-      }
-  }
+   }
 }
 
 def findDockerImages(branchName) {

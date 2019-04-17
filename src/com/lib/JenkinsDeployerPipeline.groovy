@@ -9,6 +9,7 @@ def runPipeline() {
 
   switch(branch) {
     case 'master': environment = 'prod'
+    branch = 'prod'
     break
 
     case 'qa': environment = 'qa'
@@ -34,7 +35,7 @@ def runPipeline() {
       stage('Generate Vars') {
         def file = new File("${WORKSPACE}/deployment/terraform/webplatform.tfvars")
         file.write """
-        mysql_user              =  "${branch}"
+        mysql_user              =  "${branch}-user"
         mysql_database          =  "${mysql_database}"
         mysql_host              =  "webplatform-mysql"
         webplatform_namespace   =  "${environment}"
@@ -49,17 +50,21 @@ def runPipeline() {
       }
 
       stage('Terraform Apply/Plan') {
+
         if (params.terraformApply) {
+
           dir("${WORKSPACE}/deployment/terraform") {
             echo "##### Terraform Applying the Changes ####"
             sh "terraform apply  --auto-approve  -var-file=webplatform.tfvars"
-            sh 'ls'
           }
+
         } else {
+
             dir("${WORKSPACE}/deployment/terraform") {
               echo "##### Terraform Plan (Check) the Changes ####"
               sh "terraform plan -var-file=webplatform.tfvars"
             }
+
         }
       }
    }
@@ -71,16 +76,11 @@ def findDockerImages(branchName) {
   def myJsonreader = new JsonSlurper()
   def nexusData = myJsonreader.parse(new URL("http://nexus.fuchicorp.com/service/rest/v1/components?repository=webplatform"))
 
-  if (branchName.toLowerCase() == 'master') {
-    branchName = 'prod'
-  }
-
   nexusData.items.each {
     if (it.name.contains(branchName)) {
        versionList.add(it.name + ':' + it.version)
     }
   }
-
   return versionList
 }
 

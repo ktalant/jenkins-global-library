@@ -35,7 +35,7 @@ def runPipeline() {
       stage('Generate Vars') {
         def file = new File("${WORKSPACE}/deployment/terraform/webplatform.tfvars")
         file.write """
-        mysql_user              =  "${branch}-user"
+        mysql_user              =  "${branch}user"
         mysql_database          =  "${mysql_database}"
         mysql_host              =  "webplatform-mysql"
         webplatform_namespace   =  "${environment}"

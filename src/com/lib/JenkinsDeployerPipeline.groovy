@@ -23,10 +23,11 @@ def runPipeline() {
         print('This branch does not supported')
   }
 
-  node('master') {
+  node('dev') {
     properties([ parameters([
       choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
+      booleanParam(defaultValue: false, description: 'Destroy All', name: 'terraformDestroy'),
       string( defaultValue: 'webplatform', name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name')
 
       ]
@@ -63,6 +64,27 @@ def runPipeline() {
             dir("${WORKSPACE}/deployment/terraform") {
               echo "##### Terraform Plan (Check) the Changes ####"
               sh "terraform plan -var-file=webplatform.tfvars"
+            }
+
+        }
+      }
+           
+           
+           
+      stage('Terraform Destroy') {
+
+        if (params.terraformDestroy) {
+
+          dir("${WORKSPACE}/deployment/terraform") {
+            echo "##### Terraform Destroing ####"
+            sh "terraform destroy"
+          }
+
+        } else {
+
+            dir("${WORKSPACE}/deployment/terraform") {
+              echo "##### Terraform Plan (Check) the Changes ####"
+              sh ""
             }
 
         }

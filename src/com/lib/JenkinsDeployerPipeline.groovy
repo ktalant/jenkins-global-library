@@ -18,6 +18,9 @@ def runPipeline() {
     case 'dev': environment = 'dev'
     break
 
+    case 'boolean-destroy': environment = 'dev'
+    break
+
     default:
         currentBuild.result = 'FAILURE'
         print('This branch does not supported')

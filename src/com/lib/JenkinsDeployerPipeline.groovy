@@ -51,42 +51,34 @@ def runPipeline() {
       }
 
       stage('Terraform Apply/Plan') {
-
-        if (params.terraformApply) {
-
-          dir("${WORKSPACE}/deployment/terraform") {
-            echo "##### Terraform Applying the Changes ####"
-            sh "terraform apply  --auto-approve  -var-file=webplatform.tfvars"
-          }
-
-        } else {
+        if (!params.terraformDestroy) {
+          if (params.terraformApply) {
 
             dir("${WORKSPACE}/deployment/terraform") {
-              echo "##### Terraform Plan (Check) the Changes ####"
-              sh "terraform plan -var-file=webplatform.tfvars"
+              echo "##### Terraform Applying the Changes ####"
+              sh "terraform apply  --auto-approve  -var-file=webplatform.tfvars"
             }
 
+          } else {
+
+              dir("${WORKSPACE}/deployment/terraform") {
+                echo "##### Terraform Plan (Check) the Changes ####"
+                sh "terraform plan -var-file=webplatform.tfvars"
+              }
+
+          }
         }
       }
-           
-      stage('Terraform Destroy') {
-
+      if (!params.terraformApply) {
         if (params.terraformDestroy) {
-
-          dir("${WORKSPACE}/deployment/terraform") {
-            echo "##### Terraform Destroing ####"
-            sh "terraform destroy"
+            stage('Terraform Destroy') {
+              dir("${WORKSPACE}/deployment/terraform") {
+                echo "##### Terraform Destroing ####"
+                sh "terraform destroy"
+              }
           }
-
-        } else {
-
-            dir("${WORKSPACE}/deployment/terraform") {
-              echo "##### Terraform Plan (Check) the Changes ####"
-              sh ""
-            }
-
         }
-      }
+     }
    }
 }
 

@@ -18,12 +18,14 @@ def runPipeline() {
     case 'dev': environment = 'dev'
     break
 
+    case 'boolean-destroy': environment = 'dev'
+    break
     default:
         currentBuild.result = 'FAILURE'
         print('This branch does not supported')
   }
 
-  node('dev') {
+  node('master') {
     properties([ parameters([
       choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
@@ -78,6 +80,15 @@ def runPipeline() {
               }
           }
         }
+     }
+       if (params.terraformDestroy) {
+       if (params.terraformApply) {
+         println("""
+
+         Sorry you can not destroy and apply at the same time
+
+         """)
+       }
      }
    }
 }

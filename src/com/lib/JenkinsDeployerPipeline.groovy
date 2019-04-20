@@ -17,7 +17,7 @@ def runPipeline() {
 
     case 'dev': environment = 'dev'
     break
-    
+
     default:
         currentBuild.result = 'FAILURE'
         print('This branch does not supported')
@@ -76,7 +76,7 @@ def runPipeline() {
               stage('Terraform Destroy') {
                 dir("${WORKSPACE}/deployment/terraform") {
                   echo "##### Terraform Destroing ####"
-                  sh "terraform destroy"
+                  sh "terraform destroy --auto-approve -var-file=webplatform.tfvars"
                 }
             }
           } else {

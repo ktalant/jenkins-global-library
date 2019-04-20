@@ -81,6 +81,11 @@ def findDockerImages(branchName) {
        versionList.add(it.name + ':' + it.version)
     }
   }
+
+  if (versionList.isEmpty()) {
+    return ['none']
+  }
+
   return versionList
 }
 

@@ -17,10 +17,7 @@ def runPipeline() {
 
     case 'dev': environment = 'dev'
     break
-
-    case 'boolean-destroy': environment = 'dev'
-    branch = 'boolean-destroy'
-    break
+    
     default:
         currentBuild.result = 'FAILURE'
         print('This branch does not supported')
@@ -75,15 +72,24 @@ def runPipeline() {
       stage('Terraform Destroy') {
       if (!params.terraformApply) {
         if (params.terraformDestroy) {
-            stage('Terraform Destroy') {
-              dir("${WORKSPACE}/deployment/terraform") {
-                echo "##### Terraform Destroing ####"
-                sh "terraform destroy"
-              }
+          if ( branch == 'dev') {
+              stage('Terraform Destroy') {
+                dir("${WORKSPACE}/deployment/terraform") {
+                  echo "##### Terraform Destroing ####"
+                  sh "terraform destroy"
+                }
+            }
+          } else {
+            println("""
+
+            Sorry I can not destroy ${branch}!!!
+            I can Destroy only dev branch
+
+            """)
           }
         }
      }
- 
+
        if (params.terraformDestroy) {
        if (params.terraformApply) {
          println("""

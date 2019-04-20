@@ -71,6 +71,7 @@ def runPipeline() {
           }
         }
       }
+      stage('Terraform Destroy') {
       if (!params.terraformApply) {
         if (params.terraformDestroy) {
             stage('Terraform Destroy') {
@@ -81,6 +82,7 @@ def runPipeline() {
           }
         }
      }
+ 
        if (params.terraformDestroy) {
        if (params.terraformApply) {
          println("""
@@ -91,6 +93,7 @@ def runPipeline() {
        }
      }
    }
+ }
 }
 
 def findDockerImages(branchName) {

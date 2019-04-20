@@ -17,7 +17,7 @@ def runPipeline() {
 
     case 'dev': environment = 'dev'
     break
-
+    
     default:
         currentBuild.result = 'FAILURE'
         print('This branch does not supported')
@@ -27,6 +27,7 @@ def runPipeline() {
     properties([ parameters([
       choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
+      booleanParam(defaultValue: false, description: 'Destroy All', name: 'terraformDestroy'),
       string( defaultValue: 'webplatform', name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name')
 
       ]
@@ -50,24 +51,56 @@ def runPipeline() {
       }
 
       stage('Terraform Apply/Plan') {
-
-        if (params.terraformApply) {
-
-          dir("${WORKSPACE}/deployment/terraform") {
-            echo "##### Terraform Applying the Changes ####"
-            sh "terraform apply  --auto-approve  -var-file=webplatform.tfvars"
-          }
-
-        } else {
+        if (!params.terraformDestroy) {
+          if (params.terraformApply) {
 
             dir("${WORKSPACE}/deployment/terraform") {
-              echo "##### Terraform Plan (Check) the Changes ####"
-              sh "terraform plan -var-file=webplatform.tfvars"
+              echo "##### Terraform Applying the Changes ####"
+              sh "terraform apply  --auto-approve  -var-file=webplatform.tfvars"
             }
 
+          } else {
+
+              dir("${WORKSPACE}/deployment/terraform") {
+                echo "##### Terraform Plan (Check) the Changes ####"
+                sh "terraform plan -var-file=webplatform.tfvars"
+              }
+
+          }
         }
       }
+      stage('Terraform Destroy') {
+      if (!params.terraformApply) {
+        if (params.terraformDestroy) {
+          if ( branch == 'dev') {
+              stage('Terraform Destroy') {
+                dir("${WORKSPACE}/deployment/terraform") {
+                  echo "##### Terraform Destroing ####"
+                  sh "terraform destroy"
+                }
+            }
+          } else {
+            println("""
+
+            Sorry I can not destroy ${branch}!!!
+            I can Destroy only dev branch
+
+            """)
+          }
+        }
+     }
+
+       if (params.terraformDestroy) {
+       if (params.terraformApply) {
+         println("""
+
+         Sorry you can not destroy and apply at the same time
+
+         """)
+       }
+     }
    }
+ }
 }
 
 def findDockerImages(branchName) {

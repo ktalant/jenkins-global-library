@@ -19,6 +19,7 @@ def runPipeline() {
     break
 
     case 'boolean-destroy': environment = 'dev'
+    branch = 'boolean-destroy'
     break
     default:
         currentBuild.result = 'FAILURE'

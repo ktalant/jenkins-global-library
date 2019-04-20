@@ -70,34 +70,32 @@ def runPipeline() {
         }
       }
       stage('Terraform Destroy') {
-      if (!params.terraformApply) {
-        if (params.terraformDestroy) {
-          if ( branch == 'dev') {
-              stage('Terraform Destroy') {
-                dir("${WORKSPACE}/deployment/terraform") {
-                  echo "##### Terraform Destroing ####"
-                  sh "terraform destroy --auto-approve -var-file=webplatform.tfvars"
-                }
+        if (!params.terraformApply) {
+          if (params.terraformDestroy) {
+            if ( branch == 'dev') {
+              dir("${WORKSPACE}/deployment/terraform") {
+                echo "##### Terraform Destroing ####"
+                sh "terraform destroy --auto-approve -var-file=webplatform.tfvars"
+              }
+            } else {
+              println("""
+
+              Sorry I can not destroy ${branch}!!!
+              I can Destroy only dev branch
+
+              """)
             }
-          } else {
-            println("""
-
-            Sorry I can not destroy ${branch}!!!
-            I can Destroy only dev branch
-
-            """)
           }
-        }
-     }
+       }
 
        if (params.terraformDestroy) {
-       if (params.terraformApply) {
-         println("""
+         if (params.terraformApply) {
+           println("""
 
-         Sorry you can not destroy and apply at the same time
+           Sorry you can not destroy and apply at the same time
 
-         """)
-       }
+           """)
+         }
      }
    }
  }

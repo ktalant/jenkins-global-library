@@ -28,7 +28,7 @@ def runPipeline() {
       choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
       string( defaultValue: 'webplatform', name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name'),
-      string(defaultValue: 'webplatform', description: 'Please enter a username for MySQL', name: 'mysql_user', trim: true)
+      string(defaultValue: 'webplatformUser',  name: 'mysql_user',description: 'Please enter a username for MySQL', trim: true)
 
       ]
       )])
@@ -36,7 +36,7 @@ def runPipeline() {
       stage('Generate Vars') {
         def file = new File("${WORKSPACE}/deployment/terraform/webplatform.tfvars")
         file.write """
-        mysql_user              =  "${branch}user"
+        mysql_user              =  "${mysql_user}"
         mysql_database          =  "${mysql_database}"
         mysql_host              =  "webplatform-mysql"
         webplatform_namespace   =  "${environment}"

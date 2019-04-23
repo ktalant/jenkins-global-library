@@ -51,24 +51,54 @@ def runPipeline() {
       }
 
       stage('Terraform Apply/Plan') {
-
-        if (params.terraformApply) {
-
-          dir("${WORKSPACE}/deployment/terraform") {
-            echo "##### Terraform Applying the Changes ####"
-            sh "terraform apply  --auto-approve  -var-file=webplatform.tfvars"
-          }
-
-        } else {
+        if (!params.terraformDestroy) {
+          if (params.terraformApply) {
 
             dir("${WORKSPACE}/deployment/terraform") {
-              echo "##### Terraform Plan (Check) the Changes ####"
-              sh "terraform plan -var-file=webplatform.tfvars"
+              echo "##### Terraform Applying the Changes ####"
+              sh "terraform apply  --auto-approve  -var-file=webplatform.tfvars"
             }
 
+          } else {
+
+              dir("${WORKSPACE}/deployment/terraform") {
+                echo "##### Terraform Plan (Check) the Changes ####"
+                sh "terraform plan -var-file=webplatform.tfvars"
+              }
+
+          }
         }
       }
+      stage('Terraform Destroy') {
+        if (!params.terraformApply) {
+          if (params.terraformDestroy) {
+            if ( branch == 'dev') {
+              dir("${WORKSPACE}/deployment/terraform") {
+                echo "##### Terraform Destroing ####"
+                sh "terraform destroy --auto-approve -var-file=webplatform.tfvars"
+              }
+            } else {
+              println("""
+
+              Sorry I can not destroy ${branch}!!!
+              I can Destroy only dev branch
+
+              """)
+            }
+          }
+       }
+
+       if (params.terraformDestroy) {
+         if (params.terraformApply) {
+           println("""
+
+           Sorry you can not destroy and apply at the same time
+
+           """)
+         }
+     }
    }
+ }
 }
 
 def findDockerImages(branchName) {
@@ -82,6 +112,11 @@ def findDockerImages(branchName) {
        versionList.add(it.name + ':' + it.version)
     }
   }
+
+  if (versionList.isEmpty()) {
+    return ['none']
+  }
+
   return versionList
 }
 

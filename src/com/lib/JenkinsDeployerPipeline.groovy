@@ -2,6 +2,11 @@
 package com.lib
 import groovy.json.JsonSlurper
 
+def slackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
+def slackTokenId = 'slack-token'
+def salckChannel = 'test-message'
+
+
 def runPipeline() {
 
   def environment = ""
@@ -34,6 +39,7 @@ def runPipeline() {
       ]
       )])
       checkout scm
+      notifySlackStarted()
       stage('Generate Vars') {
         def file = new File("${WORKSPACE}/deployment/terraform/webplatform.tfvars")
         file.write """
@@ -117,10 +123,39 @@ def findDockerImages(branchName) {
   if (versionList.isEmpty()) {
     return ['none']
   }
-
   return versionList
 }
 
 
+
+def notifySlackStarted() {
+    slackSend (color: '#FFFF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
+    message: """
+    Please add let team know if this is mistake or please send an email
+
+    STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}).
+    email: fuchicorpsolution@gmail.com
+    """)
+}
+
+def notifySlackSuccessful() {
+    slackSend (color: '#00FF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
+    message: """
+    Jenkins Job was successfully built.
+
+    SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})
+    email: fuchicorpsolution@gmail.com
+    """)
+}
+
+def notifySlackFailed() {
+    slackSend (color: '#FF0000', baseUrl : "${slackUrl}".toString(),  tokenCredentialId: "${slackTokenId}".toString(),
+    message: """
+    Jenkins build is breaking for some reason. Please go to job and take actions.
+
+    FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+    email: fuchicorpsolution@gmail.com
+    """)
+}
 
 return this

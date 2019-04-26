@@ -2,9 +2,7 @@
 package com.lib
 import groovy.json.JsonSlurper
 
-def salckChannel = 'test-message'
-slackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
-slackTokenId = 'slack-token'
+
 
 
 
@@ -13,6 +11,9 @@ def runPipeline() {
 
   def environment = ""
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
+  def salckChannel = 'test-message'
+  slackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
+  slackTokenId = 'slack-token'
 
   switch(branch) {
     case 'master': environment = 'prod'

@@ -2,8 +2,8 @@
 package com.lib
 import groovy.json.JsonSlurper
 
-def slackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
-def slackTokenId = 'slack-token'
+def fuchicorpSlackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
+def fuchiCorpSlackToken = 'slack-token'
 def salckChannel = 'test-message'
 
 
@@ -129,7 +129,7 @@ def findDockerImages(branchName) {
 
 
 def notifySlackStarted() {
-    slackSend (color: '#FFFF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
+    slackSend (color: '#FFFF00', baseUrl : "${fuchicorpSlackUrl}".toString(), tokenCredentialId: "${fuchiCorpSlackToken}".toString(),
     message: """
     Please add let team know if this is mistake or please send an email
 
@@ -139,7 +139,7 @@ def notifySlackStarted() {
 }
 
 def notifySlackSuccessful() {
-    slackSend (color: '#00FF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
+    slackSend (color: '#00FF00', baseUrl : "${fuchicorpSlackUrl}".toString(), tokenCredentialId: "${fuchiCorpSlackToken}".toString(),
     message: """
     Jenkins Job was successfully built.
 
@@ -149,7 +149,7 @@ def notifySlackSuccessful() {
 }
 
 def notifySlackFailed() {
-    slackSend (color: '#FF0000', baseUrl : "${slackUrl}".toString(),  tokenCredentialId: "${slackTokenId}".toString(),
+    slackSend (color: '#FF0000', baseUrl : "${fuchicorpSlackUrl}".toString(),  tokenCredentialId: "${fuchiCorpSlackToken}".toString(),
     message: """
     Jenkins build is breaking for some reason. Please go to job and take actions.
 

@@ -2,9 +2,10 @@
 package com.lib
 import groovy.json.JsonSlurper
 
-def fuchicorpSlackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
-def fuchiCorpSlackToken = 'slack-token'
 def salckChannel = 'test-message'
+fuchicorpSlackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
+fuchiCorpSlackToken = 'slack-token'
+
 
 
 def runPipeline() {

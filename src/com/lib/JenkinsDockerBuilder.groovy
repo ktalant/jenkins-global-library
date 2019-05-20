@@ -70,7 +70,7 @@ def runPipeline() {
       stage('Push image') {
 
          // Push image to the Nexus with new release
-          docker.withRegistry('docker.fuchicorp.com', 'docker-private-credentials') {
+          docker.withRegistry('docker.fuchicorp.com', 'nexus-private-admin-credentials') {
               app.push("${env.release}")
               app.push("latest")
           }

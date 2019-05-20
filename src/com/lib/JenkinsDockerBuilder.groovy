@@ -56,6 +56,7 @@ def runPipeline() {
       env.release = sh returnStdout: true, script: '''
       git fetch --tags --force
       git describe --abbrev=0 --tags'''
+      println("New release ${env.release}")
     }
 
     if (!commonDeployer.findDockerImages(branch).contains(env.release)) {

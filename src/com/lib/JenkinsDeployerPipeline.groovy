@@ -19,11 +19,9 @@ def runPipeline() {
     break
 
     case 'qa': environment = 'qa'
-    endpoint = "qa" + ".academy.fuchicorp.com"
     break
 
     case 'dev': environment = 'dev'
-    endpoint = "dev" + ".academy.fuchicorp.com"
     break
 
     default:
@@ -34,7 +32,6 @@ def runPipeline() {
   node('master') {
     properties([ parameters([
       choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
-      // string( defaultValue: 'webplatform-dev', name: 'SelectedDockerImage', description: 'Please enter docker image'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
       booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraformDestroy'),
       string( defaultValue: 'webplatform', name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name'),
@@ -54,7 +51,7 @@ def runPipeline() {
         webplatform_namespace     =  "${environment}"
         webplatform_password      =  "${mysql_password}"
         webplatform_image         =  "docker.fuchicorp.com/${SelectedDockerImage}"
-        dns_endpoint_webplatform  =  "${endpoint}"
+        environment               =  "${environment}"
         """
       }
 

@@ -76,7 +76,7 @@ def runPipeline() {
 
               dir("${WORKSPACE}/deployment/terraform") {
                 echo "##### Terraform Plan (Check) the Changes ####"
-                // sh "terraform plan -var-file=webplatform.tfvars"
+                sh "terraform plan -var-file=webplatform.tfvars"
               }
 
           }

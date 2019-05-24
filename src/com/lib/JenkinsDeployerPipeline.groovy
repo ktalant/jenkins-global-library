@@ -114,19 +114,16 @@ def runPipeline() {
 
 def findDockerImages(branchName) {
   def versionList = []
-
-  try {
-    def myJsonreader = new JsonSlurper()
-    def nexusData = myJsonreader.parse(new URL("http://nexus.fuchicorp.com/service/rest/v1/components?repository=webplatform"))
-    nexusData.items.each {
-      if (it.name.contains(branchName)) {
-         versionList.add(it.name + ':' + it.version)
-       }
+  def myJsonreader = new JsonSlurper()
+  def json = sh (returnStdout: true, script: "curl -X GET 'https://nexus.fuchicorp.com/service/rest/v1/components?repository=webplatform' -H 'accept: application/json'")
+  def nexusData = myJsonreader.parse(json)
+  nexusData.items.each {
+    if (it.name.contains(branchName)) {
+       versionList.add(it.name + ':' + it.version)
      }
-    } catch (Exception e) {}
-
+    }
   if (versionList.isEmpty()) {
-    return ['none']
+    return ['ImageNotFound']
   }
 
   return versionList

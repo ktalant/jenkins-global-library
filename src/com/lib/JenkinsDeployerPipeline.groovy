@@ -3,13 +3,10 @@ package com.lib
 import groovy.json.JsonSlurper
 
 
-
-
-
-
 def runPipeline() {
 
   def environment = ""
+  def endpoint    = "academy.fuchicorp.com"
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
   def salckChannel = 'test-message'
 
@@ -22,9 +19,11 @@ def runPipeline() {
     break
 
     case 'qa': environment = 'qa'
+    endpoint = "qa" + ".academy.fuchicorp.com"
     break
 
     case 'dev': environment = 'dev'
+    endpoint = "dev" + ".academy.fuchicorp.com"
     break
 
     default:
@@ -47,11 +46,12 @@ def runPipeline() {
       stage('Generate Vars') {
         def file = new File("${WORKSPACE}/deployment/terraform/webplatform.tfvars")
         file.write """
-        mysql_user              =  "${mysql_user}"
-        mysql_database          =  "${mysql_database}"
-        mysql_host              =  "webplatform-mysql"
-        webplatform_namespace   =  "${environment}"
-        webplatform_image       =  "nexus.fuchicorp.com:8085/${SelectedDockerImage}"
+        mysql_user                =  "${mysql_user}"
+        mysql_database            =  "${mysql_database}"
+        mysql_host                =  "webplatform-mysql"
+        webplatform_namespace     =  "${environment}"
+        webplatform_image         =  "docker.fuchicorp.com/${SelectedDockerImage}"
+        dns_endpoint_webplatform  =  "${endpoint}"
         """
       }
 
@@ -67,14 +67,14 @@ def runPipeline() {
 
             dir("${WORKSPACE}/deployment/terraform") {
               echo "##### Terraform Applying the Changes ####"
-              sh "terraform apply  --auto-approve  -var-file=webplatform.tfvars"
+              // sh "terraform apply  --auto-approve  -var-file=webplatform.tfvars"
             }
 
           } else {
 
               dir("${WORKSPACE}/deployment/terraform") {
                 echo "##### Terraform Plan (Check) the Changes ####"
-                sh "terraform plan -var-file=webplatform.tfvars"
+                // sh "terraform plan -var-file=webplatform.tfvars"
               }
 
           }
@@ -86,7 +86,7 @@ def runPipeline() {
             if ( branch == 'dev') {
               dir("${WORKSPACE}/deployment/terraform") {
                 echo "##### Terraform Destroing ####"
-                sh "terraform destroy --auto-approve -var-file=webplatform.tfvars"
+                // sh "terraform destroy --auto-approve -var-file=webplatform.tfvars"
               }
             } else {
               println("""

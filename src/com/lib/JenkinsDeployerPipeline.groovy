@@ -83,7 +83,7 @@ def runPipeline() {
       stage('Terraform Destroy') {
         if (!params.terraformApply) {
           if (params.terraformDestroy) {
-            if ( branch == 'dev') {
+            if ( branch == 'dev' || branch == 'qa' ) {
               dir("${WORKSPACE}/deployment/terraform") {
                 echo "##### Terraform Destroing ####"
                 sh "terraform destroy --auto-approve -var-file=webplatform.tfvars"
@@ -91,8 +91,8 @@ def runPipeline() {
             } else {
               println("""
 
-              Sorry I can not destroy ${branch}!!!
-              I can Destroy only dev branch
+              Sorry I can not destroy PROD!!!
+              I can Destroy only dev and qa branch
 
               """)
             }

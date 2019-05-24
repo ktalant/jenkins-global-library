@@ -88,7 +88,7 @@ def runPipeline() {
             if ( branch == 'dev') {
               dir("${WORKSPACE}/deployment/terraform") {
                 echo "##### Terraform Destroing ####"
-                // sh "terraform destroy --auto-approve -var-file=webplatform.tfvars"
+                sh "terraform destroy --auto-approve -var-file=webplatform.tfvars"
               }
             } else {
               println("""

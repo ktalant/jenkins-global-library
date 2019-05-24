@@ -114,7 +114,6 @@ def findDockerImages(branchName) {
   def versionList = []
   def myJsonreader = new JsonSlurper()
   def nexusData = myJsonreader.parse(new URL("https://nexus.fuchicorp.com/service/rest/v1/components?repository=webplatform"))
-  println(nexusData)
   nexusData.items.each {
     if (it.name.contains(branchName)) {
        versionList.add(it.name + ':' + it.version)

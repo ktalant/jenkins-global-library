@@ -34,7 +34,7 @@ def runPipeline() {
   node('master') {
     properties([ parameters([
       // choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
-      string( defaultValue: 'docker.fuchicorp.com/webplatform-dev', name: 'SelectedDockerImage', description: 'Please enter docker image'),
+      string( defaultValue: 'webplatform-dev', name: 'SelectedDockerImage', description: 'Please enter docker image'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
       booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraformDestroy'),
       string( defaultValue: 'webplatform', name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name'),

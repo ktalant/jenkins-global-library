@@ -42,7 +42,7 @@ def runPipeline() {
       ]
       )])
       checkout scm
-      notifyStarted()
+      // notifyStarted()
       stage('Generate Vars') {
         def file = new File("${WORKSPACE}/deployment/terraform/webplatform.tfvars")
         file.write """
@@ -102,9 +102,7 @@ def runPipeline() {
        if (params.terraformDestroy) {
          if (params.terraformApply) {
            println("""
-
            Sorry you can not destroy and apply at the same time
-
            """)
          }
      }
@@ -137,25 +135,16 @@ def findDockerImages(branchName) {
 def notifyStarted() {
     slackSend (color: '#FFFF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
     message: """
-    #
-    #
-    ########   Please add let team know if this is mistake or please send an email
-    #
-    #
+    ## Please add let team know if this is mistake or please send an email
     STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}).
     email: fuchicorpsolution@gmail.com
-
     """)
 }
 
 def notifySuccessful() {
     slackSend (color: '#00FF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
     message: """
-    #
-    #
-    ########   Jenkins Job was successfully built. #######
-    #
-    #
+    ## Jenkins Job was successfully built. #######
     SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})
     email: fuchicorpsolution@gmail.com
     #
@@ -165,11 +154,7 @@ def notifySuccessful() {
 def notifyFailed() {
     slackSend (color: '#FF0000', baseUrl : "${slackUrl}".toString(),  tokenCredentialId: "${slackTokenId}".toString(),
     message: """
-    #
-    #
-    ########   Jenkins build is breaking for some reason. Please go to job and take actions.
-    #
-    #
+    ## Jenkins build is breaking for some reason. Please go to job and take actions.
     FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
     email: fuchicorpsolution@gmail.com
     """)

@@ -69,7 +69,7 @@ def runPipeline() {
 
             dir("${WORKSPACE}/deployment/terraform") {
               echo "##### Terraform Applying the Changes ####"
-              // sh "terraform apply  --auto-approve  -var-file=webplatform.tfvars"
+              sh "terraform apply  --auto-approve  -var-file=webplatform.tfvars"
             }
 
           } else {

@@ -49,11 +49,6 @@ def runPipeline() {
   node {
     checkout scm
     def app
-    stage('Copy kube config') {
-
-      // Copy config files to WORKSPACE if does not exist
-      sh 'if [ -f config ]; then  :; else cp -rf /fuchicorp/* ${WORKSPACE} ; fi'
-    }
 
     stage('New release GIT') {
 
@@ -61,6 +56,7 @@ def runPipeline() {
       env.release = sh returnStdout: true, script: '''
       git fetch --tags --force
       git describe --abbrev=0 --tags'''
+      println("New release ${env.release}")
     }
 
     if (!commonDeployer.findDockerImages(branch).contains(env.release)) {
@@ -74,14 +70,15 @@ def runPipeline() {
       stage('Push image') {
 
          // Push image to the Nexus with new release
-          docker.withRegistry('http://nexus.fuchicorp.com:8085', 'docker-private-credentials') {
+          docker.withRegistry('https://docker.fuchicorp.com', 'nexus-private-admin-credentials') {
               app.push("${env.release}")
               app.push("latest")
           }
        }
+
        stage('clean up') {
-         sh "docker rmi nexus.fuchicorp.com:8085/${repositoryName}:${env.release}"
-         sh "docker rmi nexus.fuchicorp.com:8085/${repositoryName}:latest "
+         sh "docker rmi docker.fuchicorp.com/${repositoryName}:${env.release}"
+         sh "docker rmi docker.fuchicorp.com/${repositoryName}:latest"
          sh "rm -rf ${WORKSPACE}/*"
        }
       }

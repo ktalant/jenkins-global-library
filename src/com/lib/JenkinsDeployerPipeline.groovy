@@ -33,8 +33,8 @@ def runPipeline() {
 
   node('master') {
     properties([ parameters([
-      // choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
-      string( defaultValue: 'webplatform-dev', name: 'SelectedDockerImage', description: 'Please enter docker image'),
+      choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
+      // string( defaultValue: 'webplatform-dev', name: 'SelectedDockerImage', description: 'Please enter docker image'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
       booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraformDestroy'),
       string( defaultValue: 'webplatform', name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name'),
@@ -112,6 +112,26 @@ def runPipeline() {
    }
  }
 }
+
+def findDockerImages(branchName) {
+  def versionList = []
+  def myJsonreader = new JsonSlurper()
+  def nexusData = myJsonreader.parse(new URL("https://nexus.fuchicorp.com/service/rest/v1/components?repository=webplatform"))
+  println(nexusData)
+  nexusData.items.each {
+    if (it.name.contains(branchName)) {
+       versionList.add(it.name + ':' + it.version)
+     }
+    }
+
+
+  if (versionList.isEmpty()) {
+    return ['ImageNotFound']
+  }
+
+  return versionList
+}
+
 
 def notifyStarted() {
     slackSend (color: '#FFFF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),

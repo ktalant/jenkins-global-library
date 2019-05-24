@@ -3,18 +3,15 @@ package com.lib
 import groovy.json.JsonSlurper
 
 
-
-
-
-
 def runPipeline() {
 
   def environment = ""
+  def endpoint    = "academy.fuchicorp.com"
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
   def salckChannel = 'test-message'
 
-  slackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
-  slackTokenId = 'slack-token'
+  // slackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
+  // slackTokenId = 'slack-token'
 
   switch(branch) {
     case 'master': environment = 'prod'
@@ -22,9 +19,11 @@ def runPipeline() {
     break
 
     case 'qa': environment = 'qa'
+    endpoint = "qa" + ".academy.fuchicorp.com"
     break
 
     case 'dev': environment = 'dev'
+    endpoint = "dev" + ".academy.fuchicorp.com"
     break
 
     default:
@@ -35,23 +34,27 @@ def runPipeline() {
   node('master') {
     properties([ parameters([
       choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
+      // string( defaultValue: 'webplatform-dev', name: 'SelectedDockerImage', description: 'Please enter docker image'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
       booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraformDestroy'),
       string( defaultValue: 'webplatform', name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name'),
-      string(defaultValue: 'webplatformUser',  name: 'mysql_user',description: 'Please enter a username for MySQL', trim: true)
+      string(defaultValue: 'webplatformUser',  name: 'mysql_user',description: 'Please enter a username for MySQL', trim: true),
+      string(defaultValue: 'webplatformPassword',  name: 'mysql_password',description: 'Please enter a password for MySQL', trim: true)
 
       ]
       )])
       checkout scm
-      notifyStarted()
+      // notifyStarted()
       stage('Generate Vars') {
         def file = new File("${WORKSPACE}/deployment/terraform/webplatform.tfvars")
         file.write """
-        mysql_user              =  "${mysql_user}"
-        mysql_database          =  "${mysql_database}"
-        mysql_host              =  "webplatform-mysql"
-        webplatform_namespace   =  "${environment}"
-        webplatform_image       =  "nexus.fuchicorp.com:8085/${SelectedDockerImage}"
+        mysql_user                =  "${mysql_user}"
+        mysql_database            =  "${mysql_database}"
+        mysql_host                =  "webplatform-mysql"
+        webplatform_namespace     =  "${environment}"
+        webplatform_password      =  "${mysql_password}"
+        webplatform_image         =  "docker.fuchicorp.com/${SelectedDockerImage}"
+        dns_endpoint_webplatform  =  "${endpoint}"
         """
       }
 
@@ -102,9 +105,7 @@ def runPipeline() {
        if (params.terraformDestroy) {
          if (params.terraformApply) {
            println("""
-
            Sorry you can not destroy and apply at the same time
-
            """)
          }
      }
@@ -114,48 +115,37 @@ def runPipeline() {
 
 def findDockerImages(branchName) {
   def versionList = []
-
-  try {
-    def myJsonreader = new JsonSlurper()
-    def nexusData = myJsonreader.parse(new URL("http://nexus.fuchicorp.com/service/rest/v1/components?repository=webplatform"))
-    nexusData.items.each {
-      if (it.name.contains(branchName)) {
-         versionList.add(it.name + ':' + it.version)
-       }
+  def myJsonreader = new JsonSlurper()
+  def nexusData = myJsonreader.parse(new URL("https://nexus.fuchicorp.com/service/rest/v1/components?repository=webplatform"))
+  println(nexusData)
+  nexusData.items.each {
+    if (it.name.contains(branchName)) {
+       versionList.add(it.name + ':' + it.version)
      }
-    } catch (Exception e) {}
+    }
+
 
   if (versionList.isEmpty()) {
-    return ['none']
+    return ['ImageNotFound']
   }
 
   return versionList
 }
 
 
-
 def notifyStarted() {
     slackSend (color: '#FFFF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
     message: """
-    #
-    #
-    ########   Please add let team know if this is mistake or please send an email
-    #
-    #
+    ## Please add let team know if this is mistake or please send an email
     STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}).
     email: fuchicorpsolution@gmail.com
-
     """)
 }
 
 def notifySuccessful() {
     slackSend (color: '#00FF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
     message: """
-    #
-    #
-    ########   Jenkins Job was successfully built. #######
-    #
-    #
+    ## Jenkins Job was successfully built. #######
     SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})
     email: fuchicorpsolution@gmail.com
     #
@@ -165,11 +155,7 @@ def notifySuccessful() {
 def notifyFailed() {
     slackSend (color: '#FF0000', baseUrl : "${slackUrl}".toString(),  tokenCredentialId: "${slackTokenId}".toString(),
     message: """
-    #
-    #
-    ########   Jenkins build is breaking for some reason. Please go to job and take actions.
-    #
-    #
+    ## Jenkins build is breaking for some reason. Please go to job and take actions.
     FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
     email: fuchicorpsolution@gmail.com
     """)

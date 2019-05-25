@@ -57,7 +57,7 @@ def runPipeline() {
 
       stage('Terraform init') {
         dir("${WORKSPACE}/deployment/terraform") {
-          sh ". ./get-setenv.sh ${environment}"
+          sh "terraform init "
         }
       }
 

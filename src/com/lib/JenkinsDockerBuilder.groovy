@@ -64,7 +64,7 @@ def runPipeline() {
       stage('Build docker image') {
 
           // Build the docker image
-          app = docker.build(repositoryName, "--build-arg branch=${branch_name}")
+          app = docker.build(repositoryName, "--build-arg branch_name=${branch}")
       }
 
       stage('Push image') {

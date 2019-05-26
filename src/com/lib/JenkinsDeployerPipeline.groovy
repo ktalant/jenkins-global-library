@@ -133,7 +133,7 @@ def findDockerImages(branchName) {
 
 
 def notifyStarted() {
-    slackSend (color: '#FFFF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
+    slackSend (channel: "${salckChannel}", color: '#FFFF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
     message: """
     Please add let team know if this is mistake or please send an email
     email: fuchicorpsolution@gmail.com
@@ -142,7 +142,7 @@ def notifyStarted() {
 }
 
 def notifySuccessful() {
-    slackSend (color: '#00FF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
+    slackSend (channel: "${salckChannel}", color: '#00FF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
     message: """
     Jenkins Job was successfully built.
     email: fuchicorpsolution@gmail.com
@@ -151,7 +151,7 @@ def notifySuccessful() {
 }
 
 def notifyFailed() {
-    slackSend (color: '#FF0000', baseUrl : "${slackUrl}".toString(),  tokenCredentialId: "${slackTokenId}".toString(),
+    slackSend (channel: "${salckChannel}", color: '#FF0000', baseUrl : "${slackUrl}".toString(),  tokenCredentialId: "${slackTokenId}".toString(),
     message: """
     Jenkins build is breaking for some reason. Please go to job and take actions.
     email: fuchicorpsolution@gmail.com

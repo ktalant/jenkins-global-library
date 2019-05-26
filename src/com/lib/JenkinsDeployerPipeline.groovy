@@ -7,7 +7,7 @@ def runPipeline() {
 
   def environment = ""
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
-  def salckChannel = 'test-message'
+  def salckChannel = 'devops'
 
   slackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
   slackTokenId = 'slack-token'
@@ -135,27 +135,27 @@ def findDockerImages(branchName) {
 def notifyStarted() {
     slackSend (color: '#FFFF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
     message: """
-    ## Please add let team know if this is mistake or please send an email
-    STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}).
+    Please add let team know if this is mistake or please send an email
     email: fuchicorpsolution@gmail.com
+    STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}).
     """)
 }
 
 def notifySuccessful() {
     slackSend (color: '#00FF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
     message: """
-    ## Jenkins Job was successfully built. #######
-    SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})
+    Jenkins Job was successfully built.
     email: fuchicorpsolution@gmail.com
+    SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})
     """)
 }
 
 def notifyFailed() {
     slackSend (color: '#FF0000', baseUrl : "${slackUrl}".toString(),  tokenCredentialId: "${slackTokenId}".toString(),
     message: """
-    ## Jenkins build is breaking for some reason. Please go to job and take actions.
-    FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+    Jenkins build is breaking for some reason. Please go to job and take actions.
     email: fuchicorpsolution@gmail.com
+    FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
     """)
 }
 

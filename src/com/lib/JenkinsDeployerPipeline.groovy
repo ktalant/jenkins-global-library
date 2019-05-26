@@ -6,12 +6,11 @@ import groovy.json.JsonSlurper
 def runPipeline() {
 
   def environment = ""
-  def endpoint    = "academy.fuchicorp.com"
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
   def salckChannel = 'test-message'
 
-  // slackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
-  // slackTokenId = 'slack-token'
+  slackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
+  slackTokenId = 'slack-token'
 
   switch(branch) {
     case 'master': environment = 'prod'
@@ -40,8 +39,10 @@ def runPipeline() {
 
       ]
       )])
+
       checkout scm
-      // notifyStarted()
+      notifyStarted()
+
       stage('Generate Vars') {
         def file = new File("${WORKSPACE}/deployment/terraform/webplatform.tfvars")
         file.write """
@@ -57,7 +58,7 @@ def runPipeline() {
 
       stage('Terraform init') {
         dir("${WORKSPACE}/deployment/terraform") {
-          sh "terraform init "
+          sh "terraform init"
         }
       }
 
@@ -67,7 +68,7 @@ def runPipeline() {
 
             dir("${WORKSPACE}/deployment/terraform") {
               echo "##### Terraform Applying the Changes ####"
-              sh "terraform apply  --auto-approve  -var-file=webplatform.tfvars"
+              sh "terraform apply --auto-approve -var-file=webplatform.tfvars"
             }
 
           } else {
@@ -91,8 +92,8 @@ def runPipeline() {
             } else {
               println("""
 
-              Sorry I can not destroy PROD!!!
-              I can Destroy only dev and qa branch
+                Sorry I can not destroy PROD!!!
+                I can Destroy only dev and qa branch
 
               """)
             }
@@ -107,6 +108,8 @@ def runPipeline() {
          }
      }
    }
+   // If after finished everthing will send notification to slack
+   notifySuccessful()
  }
 }
 
@@ -144,7 +147,6 @@ def notifySuccessful() {
     ## Jenkins Job was successfully built. #######
     SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})
     email: fuchicorpsolution@gmail.com
-    #
     """)
 }
 

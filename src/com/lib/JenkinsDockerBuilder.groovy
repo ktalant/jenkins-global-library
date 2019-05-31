@@ -53,36 +53,45 @@ def runPipeline() {
         name: 'PUSH_LATEST'
         )])])
 
-  node {
-    checkout scm
+  try {
+    node {
+      checkout scm
 
 
 
-    stage('Build docker image') {
+      stage('Build docker image') {
 
-        // Build the docker image
-        dockerImage = docker.build(repositoryName, "--build-arg branch_name=${branch} .")
-    }
+          // Build the docker image
+          dockerImage = docker.build(repositoryName, "--build-arg branch_name=${branch} .")
+      }
 
-    stage('Push image') {
+      stage('Push image') {
 
-       // Push image to the Nexus with new release
-        docker.withRegistry('https://docker.fuchicorp.com', 'nexus-private-admin-credentials') {
-            dockerImage.push("0.${BUILD_NUMBER}")
+         // Push image to the Nexus with new release
+          docker.withRegistry('https://docker.fuchicorp.com', 'nexus-private-admin-credentials') {
+              dockerImage.push("0.${BUILD_NUMBER}")
 
-            if (params.PUSH_LATEST) {
-              dockerImage.push("latest")
+              if (params.PUSH_LATEST) {
+                dockerImage.push("latest")
+            }
           }
-        }
-     }
+       }
 
-     stage('clean up') {
-       sh "docker rmi docker.fuchicorp.com/${repositoryName}:0.${BUILD_NUMBER} --force "
-       sh "docker rmi docker.fuchicorp.com/${repositoryName}:latest --force"
-       sh "rm -rf ${WORKSPACE}/*"
-     }
+       stage('clean up') {
+         sh "docker rmi docker.fuchicorp.com/${repositoryName}:0.${BUILD_NUMBER} --force "
+         sh "docker rmi docker.fuchicorp.com/${repositoryName}:latest --force"
+         sh "rm -rf ${WORKSPACE}/*"
+       }
+       commonDeployer.notifySuccessful()
 
-    }
+      }
+  } catch (e) {
+    currentBuild.result = 'FAILURE'
+    println("ERROR Detected:")
+    println(e.getMessage())
+    commonDeployer.notifyFailed()
+  }
+
 }
 
 

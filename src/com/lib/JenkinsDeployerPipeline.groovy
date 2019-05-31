@@ -75,7 +75,7 @@ def runPipeline() {
               } else {
 
                   dir("${WORKSPACE}/deployment/terraform") {
-                    echo "##### Terraform Plan (Check) the Changes ####"
+                    echo "##### Terraform Plan (Check) the Changes #### ${data}"
                     sh "terraform plan -var-file=webplatform.tfvars"
                   }
 
@@ -91,7 +91,7 @@ def runPipeline() {
                     sh "terraform destroy --auto-approve -var-file=webplatform.tfvars"
                   }
                 } else {
-                  println(""" ${data}
+                  println("""
 
                     Sorry I can not destroy PROD!!!
                     I can Destroy only dev and qa branch

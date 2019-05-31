@@ -17,6 +17,7 @@ def runPipeline() {
 
 
   def commonDeployer = new com.lib.JenkinsDeployerPipeline()
+
   def repositoryName = "webplatform"
   def dockerImage
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
@@ -25,6 +26,9 @@ def runPipeline() {
   salckChannel = 'devops'
   slackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
   slackTokenId = 'slack-token'
+
+  slacknotifySuccessful = commonDeployer.notifySuccessful()
+  slacknotifynotifyFailed = commonDeployer.notifyFailed()
 
   echo "The branch name is: ${branch}"
 
@@ -80,7 +84,7 @@ def runPipeline() {
               if (params.PUSH_LATEST) {
                 dockerImage.push("latest")
             }
-              commonDeployer.notifySuccessful()
+              slacknotifySuccessful()
           }
        }
 
@@ -95,7 +99,7 @@ def runPipeline() {
     currentBuild.result = 'FAILURE'
     println("ERROR Detected:")
     println(e.getMessage())
-    commonDeployer.notifyFailed()
+    slacknotifynotifyFailed()
   }
 }
 

@@ -42,8 +42,9 @@ def runPipeline() {
           )])
 
           checkout scm
-          notifyStarted()
-
+          slackeEng = notifyStarted()
+          slackeEng()
+          
           stage('Generate Vars') {
             def file = new File("${WORKSPACE}/deployment/terraform/webplatform.tfvars")
             file.write """

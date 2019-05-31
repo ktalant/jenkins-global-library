@@ -142,30 +142,36 @@ def findDockerImages(branchName) {
 
 
 def notifyStarted() {
+  return {
     slackSend (channel: "${salckChannel}", color: '#FFFF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
     message: """
     Please add let team know if this is mistake or please send an email
     email: fuchicorpsolution@gmail.com
     STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}).
     """)
+  }
 }
 
 def notifySuccessful() {
-    slackSend (channel: "${salckChannel}", color: '#00FF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
-    message: """
-    Jenkins Job was successfully built.
-    email: fuchicorpsolution@gmail.com
-    SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})
-    """)
+    return {
+      slackSend (channel: "${salckChannel}", color: '#00FF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
+      message: """
+      Jenkins Job was successfully built.
+      email: fuchicorpsolution@gmail.com
+      SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})
+      """)
+    }
 }
 
 def notifyFailed() {
+  return {
     slackSend (channel: "${salckChannel}", color: '#FF0000', baseUrl : "${slackUrl}".toString(),  tokenCredentialId: "${slackTokenId}".toString(),
     message: """
     Jenkins build is breaking for some reason. Please go to job and take actions.
     email: fuchicorpsolution@gmail.com
     FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
     """)
+  }
 }
 
 return this

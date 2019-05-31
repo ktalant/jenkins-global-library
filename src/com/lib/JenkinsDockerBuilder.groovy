@@ -21,11 +21,6 @@ def runPipeline() {
   def dockerImage
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
 
-  // Slack configuration
-  salckChannel = 'devops'
-  slackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
-  slackTokenId = 'slack-token'
-
   echo "The branch name is: ${branch}"
 
   switch(branch) {
@@ -87,16 +82,13 @@ def runPipeline() {
          sh "docker rmi docker.fuchicorp.com/${repositoryName}:latest --force"
          sh "rm -rf ${WORKSPACE}/*"
        }
-       commonDeployer.notifySuccessful()
 
       }
   } catch (e) {
     currentBuild.result = 'FAILURE'
     println("ERROR Detected:")
     println(e.getMessage())
-    commonDeployer.notifyFailed()
   }
-
 }
 
 

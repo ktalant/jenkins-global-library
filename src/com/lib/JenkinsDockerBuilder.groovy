@@ -70,14 +70,14 @@ def runPipeline() {
         docker.withRegistry('https://docker.fuchicorp.com', 'nexus-private-admin-credentials') {
             dockerImage.push("0.${BUILD_NUMBER}")
 
-            if (params.PUSH_LATEST){
+            if (params.PUSH_LATEST) {
               dockerImage.push("latest")
           }
         }
      }
 
      stage('clean up') {
-       sh "docker rmi docker.fuchicorp.com/${repositoryName}:${env.release}"
+       sh "docker rmi docker.fuchicorp.com/${repositoryName}:0.${BUILD_NUMBER}"
        sh "docker rmi docker.fuchicorp.com/${repositoryName}:latest"
        sh "rm -rf ${WORKSPACE}/*"
      }

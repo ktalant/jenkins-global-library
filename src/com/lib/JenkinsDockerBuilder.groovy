@@ -77,8 +77,8 @@ def runPipeline() {
      }
 
      stage('clean up') {
-       sh "docker rmi docker.fuchicorp.com/${repositoryName}:0.${BUILD_NUMBER}"
-       sh "docker rmi docker.fuchicorp.com/${repositoryName}:latest"
+       sh "docker rmi docker.fuchicorp.com/${repositoryName}:0.${BUILD_NUMBER} --force "
+       sh "docker rmi docker.fuchicorp.com/${repositoryName}:latest --force"
        sh "rm -rf ${WORKSPACE}/*"
      }
 

@@ -21,6 +21,11 @@ def runPipeline() {
   def dockerImage
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
 
+
+  salckChannel = 'devops'
+  slackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
+  slackTokenId = 'slack-token'
+
   echo "The branch name is: ${branch}"
 
   switch(branch) {
@@ -71,9 +76,11 @@ def runPipeline() {
           docker.withRegistry('https://docker.fuchicorp.com', 'nexus-private-admin-credentials') {
               dockerImage.push("0.${BUILD_NUMBER}")
 
+
               if (params.PUSH_LATEST) {
                 dockerImage.push("latest")
             }
+              commonDeployer.notifySuccessful()
           }
        }
 
@@ -88,6 +95,7 @@ def runPipeline() {
     currentBuild.result = 'FAILURE'
     println("ERROR Detected:")
     println(e.getMessage())
+    commonDeployer.notifyFailed()
   }
 }
 

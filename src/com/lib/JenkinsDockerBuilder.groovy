@@ -21,6 +21,11 @@ def runPipeline() {
   def dockerImage
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
 
+  // Slack configuration
+  salckChannel = 'devops'
+  slackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
+  slackTokenId = 'slack-token'
+
   echo "The branch name is: ${branch}"
 
   switch(branch) {

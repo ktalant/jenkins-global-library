@@ -23,13 +23,6 @@ def runPipeline() {
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
 
 
-  salckChannel = 'devops'
-  slackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
-  slackTokenId = 'slack-token'
-
-  slacknotifySuccessful = commonDeployer.notifySuccessful()
-  slacknotifynotifyFailed = commonDeployer.notifyFailed()
-
   echo "The branch name is: ${branch}"
 
   switch(branch) {
@@ -84,7 +77,6 @@ def runPipeline() {
               if (params.PUSH_LATEST) {
                 dockerImage.push("latest")
             }
-              slacknotifySuccessful()
           }
        }
 
@@ -99,7 +91,6 @@ def runPipeline() {
     currentBuild.result = 'FAILURE'
     println("ERROR Detected:")
     println(e.getMessage())
-    slacknotifynotifyFailed()
   }
 }
 

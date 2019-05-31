@@ -18,6 +18,7 @@ def runPipeline() {
 
   def commonDeployer = new com.lib.JenkinsDeployerPipeline()
   def repositoryName = "webplatform"
+  def dockerImage
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
 
   echo "The branch name is: ${branch}"
@@ -45,43 +46,42 @@ def runPipeline() {
   /**
   * This library for now building image only to webplatform application
   */
+  properties([
+    parameters([
+      booleanParam(defaultValue: false,
+        description: 'Click this if you would like to deploy to latest',
+        name: 'PUSH_LATEST'
+        )])])
 
   node {
     checkout scm
-    def app
 
-    stage('New release GIT') {
 
-      // Get latest release from local git
-      env.release = sh returnStdout: true, script: '''
-      git fetch --tags --force
-      git describe --abbrev=0 --tags'''
-      println("New release ${env.release}")
+
+    stage('Build docker image') {
+
+        // Build the docker image
+        dockerImage = docker.build(repositoryName, "--build-arg branch_name=${branch} .")
     }
 
-    if (!commonDeployer.findDockerImages(branch).contains(env.release)) {
+    stage('Push image') {
 
-      stage('Build docker image') {
+       // Push image to the Nexus with new release
+        docker.withRegistry('https://docker.fuchicorp.com', 'nexus-private-admin-credentials') {
+            dockerImage.push("0.${BUILD_NUMBER}")
 
-          // Build the docker image
-          app = docker.build(repositoryName, "--build-arg branch_name=${branch} .")
-      }
-
-      stage('Push image') {
-
-         // Push image to the Nexus with new release
-          docker.withRegistry('https://docker.fuchicorp.com', 'nexus-private-admin-credentials') {
-              app.push("${env.release}")
-              app.push("latest")
+            if (params.PUSH_LATEST){
+              dockerImage.push("latest")
           }
-       }
+        }
+     }
 
-       stage('clean up') {
-         sh "docker rmi docker.fuchicorp.com/${repositoryName}:${env.release}"
-         sh "docker rmi docker.fuchicorp.com/${repositoryName}:latest"
-         sh "rm -rf ${WORKSPACE}/*"
-       }
-      }
+     stage('clean up') {
+       sh "docker rmi docker.fuchicorp.com/${repositoryName}:${env.release}"
+       sh "docker rmi docker.fuchicorp.com/${repositoryName}:latest"
+       sh "rm -rf ${WORKSPACE}/*"
+     }
+
     }
 }
 

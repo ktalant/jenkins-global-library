@@ -7,8 +7,8 @@ def runPipeline() {
 
   def environment = ""
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
-  salckChannel = 'devops'
 
+  salckChannel = 'devops'
   slackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
   slackTokenId = 'slack-token'
 

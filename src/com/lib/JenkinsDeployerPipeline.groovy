@@ -70,6 +70,7 @@ def runPipeline() {
                 dir("${WORKSPACE}/deployment/terraform") {
                   echo "##### Terraform Applying the Changes ####"
                   sh "terraform apply --auto-approve -var-file=webplatform.tfvars"
+                  notifySuccessful()
                 }
 
               } else {
@@ -77,6 +78,7 @@ def runPipeline() {
                   dir("${WORKSPACE}/deployment/terraform") {
                     echo "##### Terraform Plan (Check) the Changes ####"
                     sh "terraform plan -var-file=webplatform.tfvars"
+                    notifySuccessful()
                   }
 
               }
@@ -89,6 +91,7 @@ def runPipeline() {
                   dir("${WORKSPACE}/deployment/terraform") {
                     echo "##### Terraform Destroing ####"
                     sh "terraform destroy --auto-approve -var-file=webplatform.tfvars"
+                    notifySuccessful()
                   }
                 } else {
                   println("""
@@ -109,8 +112,6 @@ def runPipeline() {
              }
          }
        }
-       // If after finished everthing will send notification to slack
-       notifySuccessful()
      }
 
   } catch (e) {

@@ -78,7 +78,8 @@ def runPipeline() {
                   dir("${WORKSPACE}/deployment/terraform") {
                     echo "##### Terraform Plan (Check) the Changes #### "
                     sh "terraform plan -var-file=webplatform.tfvars"
-                    notifySuccessful()
+                    slackeEng = notifySuccessful()
+                    slackeEng()
                   }
 
               }
@@ -118,7 +119,8 @@ def runPipeline() {
     currentBuild.result = 'FAILURE'
     println("ERROR Detected:")
     println(e.getMessage())
-    notifyFailed()
+    slackeEng = notifyFailed()
+    slackeEng()
   }
 }
 

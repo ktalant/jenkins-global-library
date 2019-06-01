@@ -32,8 +32,7 @@ def runPipeline() {
       file(credentialsId: "fuchicorp-common-service-account", variable: 'common_user')]) {
       node('master') {
         stage('testing') {
-          sh "cat ${common_user}"
-          sh "cat ${deployment_fvars}"
+           println("${deployment_fvars}")
         }
        //    checkout scm
        //    stage('Terraform init') {

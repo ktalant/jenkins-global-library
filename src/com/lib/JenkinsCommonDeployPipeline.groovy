@@ -29,10 +29,10 @@ def runPipeline() {
 
     withCredentials([
       file(credentialsId: "${params_tfvars_id}", variable: 'deployment_fvars'),
-      file(credentialsId: "${common_service_account}", variable: 'my-public-key')]) {
+      file(credentialsId: "${common_service_account}", variable: 'common_user')]) {
       node('master') {
         stage('testing') {
-          sh "ls ${my-public-key}"
+          sh "ls ${common_user}"
           sh "ls ${deployment_fvars}"
         }
        //    checkout scm

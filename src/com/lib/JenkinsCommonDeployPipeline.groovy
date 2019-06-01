@@ -35,7 +35,7 @@ def runPipeline() {
             dir("${WORKSPACE}") {
               checkout scm
               sh """ls ${WORKSPACE}
-              source set-env.sh ${deployment_fvars}"""
+              . set-env.sh ${deployment_fvars}"""
             }
           }
        //

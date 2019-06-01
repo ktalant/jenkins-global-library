@@ -28,7 +28,7 @@ def runPipeline() {
 
     withCredentials([
       file(credentialsId: "common-tools-tfvars", variable: 'deployment_fvars'),
-      file(credentialsId: "${common_service_account}", variable: 'common_user')]) {
+      file(credentialsId: "fuchicorp-common-service-account", variable: 'common_user')]) {
       node('master') {
         stage('testing') {
           sh "ls ${common_user}"

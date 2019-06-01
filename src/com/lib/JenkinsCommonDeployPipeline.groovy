@@ -55,7 +55,7 @@ def runPipeline() {
 
                 dir("${WORKSPACE}/") {
                   echo "##### Terraform Plan (Check) the Changes #### "
-                  sh "terraform plan -var-file=$DATAFILE"
+                  sh 'terraform plan -var-file=$DATAFILE'
                 }
               }
             }

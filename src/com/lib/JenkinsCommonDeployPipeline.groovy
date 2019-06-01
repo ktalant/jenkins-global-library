@@ -35,9 +35,8 @@ def runPipeline() {
             dir("${WORKSPACE}") {
               checkout scm
               sh """#!/bin/bash -e
-              cp -rf  ${deployment_fvars} ${WORKSPACE}
-              ls ${WORKSPACE}
-              source set-env.sh ${deployment_fvars}
+              cp -rf  ${deployment_fvars} ${WORKSPACE}/fuchicorp-common-tools.tfvars
+              source set-env.sh ${WORKSPACE}/fuchicorp-common-tools.tfvars
               cat backend.tf
               """
             }

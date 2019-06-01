@@ -19,21 +19,21 @@ def runPipeline() {
   }
 
   try {
-    properties([ parameters([
-      booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraform_apply'),
-      booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraform_destroy'),
-      string(defaultValue: 'common-tools-tfvars',  name: 'params_tfvars_id', description: 'Please give tfvars secret ID', trim: true),
-      string(defaultValue: 'fuchicorp-common-service-account', name: 'common_service_account', description: 'Please enter service Account ID', trim: true)
-      ]
-      )])
+    // properties([ parameters([
+    //   booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraform_apply'),
+    //   booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraform_destroy'),
+    //   string(defaultValue: 'common-tools-tfvars',  name: 'params_tfvars_id', description: 'Please give tfvars secret ID', trim: true),
+    //   string(defaultValue: 'fuchicorp-common-service-account', name: 'common_service_account', description: 'Please enter service Account ID', trim: true)
+    //   ]
+    //   )])
 
     withCredentials([
       file(credentialsId: "common-tools-tfvars", variable: 'deployment_fvars'),
       file(credentialsId: "fuchicorp-common-service-account", variable: 'common_user')]) {
       node('master') {
         stage('testing') {
-          sh "ls ${common_user}"
-          sh "ls ${deployment_fvars}"
+          sh "cat ${common_user}"
+          sh "cat ${deployment_fvars}"
         }
        //    checkout scm
        //    stage('Terraform init') {

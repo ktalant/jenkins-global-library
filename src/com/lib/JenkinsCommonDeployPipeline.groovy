@@ -19,7 +19,6 @@ def runPipeline() {
 
   try {
     properties([ parameters([
-      choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraform_apply'),
       booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraform_destroy'),
       string(defaultValue: 'common-tools-tfvars',  name: 'params_tfvars_id', description: 'Please give tfvars secret ID', trim: true),

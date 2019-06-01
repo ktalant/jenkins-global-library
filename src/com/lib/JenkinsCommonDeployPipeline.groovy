@@ -19,18 +19,18 @@ def runPipeline() {
   }
 
   // try {
-    // properties([ parameters([
-    //   booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraform_apply'),
-    //   booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraform_destroy'),
-    //   string(defaultValue: 'common-tools-tfvars',  name: 'params_tfvars_id', description: 'Please give tfvars secret ID', trim: true),
-    //   string(defaultValue: 'fuchicorp-common-service-account', name: 'common_service_account', description: 'Please enter service Account ID', trim: true)
-    //   ]
-    //   )])
+    properties([ parameters([
+      booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraform_apply'),
+      booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraform_destroy'),
+      string(defaultValue: 'common-tools-tfvars',  name: 'params_tfvars_id', description: 'Please give tfvars secret ID', trim: true),
+      string(defaultValue: 'fuchicorp-google-service-account', name: 'common_service_account', description: 'Please enter service Account ID', trim: true)
+      ]
+      )])
 
       node('master') {
         withCredentials([
           file(credentialsId: "common-tools-tfvars", variable: 'deployment_fvars'),
-          file(credentialsId: "fuchicorp-google-service-account", variable: 'common_user')]) {
+          file(credentialsId: "${common_service_account}", variable: 'common_user')]) {
             stage('testing') {
                println("${deployment_fvars}")
             }

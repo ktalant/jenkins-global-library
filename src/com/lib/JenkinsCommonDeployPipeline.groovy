@@ -31,10 +31,9 @@ def runPipeline() {
         withCredentials([
           file(credentialsId: "${params_tfvars_id}", variable: 'deployment_fvars'),
           file(credentialsId: "${common_service_account}", variable: 'common_user')]) {
-
-          checkout scm
           stage('Terraform init') {
-            dir("${WORKSPACE}/") {
+            dir("${WORKSPACE}") {
+              checkout scm
               sh "source set-env.sh ${deployment_fvars}"
             }
           }

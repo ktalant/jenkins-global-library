@@ -34,8 +34,11 @@ def runPipeline() {
           stage('Terraform init') {
             dir("${WORKSPACE}") {
               checkout scm
-              sh """ls ${WORKSPACE}
-              . set-env.sh ${deployment_fvars}"""
+              sh """
+              set -e
+              source set-env.sh ${deployment_fvars}
+              cat backend.tf
+              """
             }
           }
        //

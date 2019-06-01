@@ -37,6 +37,7 @@ def runPipeline() {
               sh """#!/bin/bash -e
               cp -rf ${common_user} ${WORKSPACE}/fuchicorp-service-account.json
               cp -rf  ${deployment_fvars} ${WORKSPACE}/fuchicorp-common-tools.tfvars
+              ls fuchicorp-service-account.json
               source set-env.sh ./fuchicorp-common-tools.tfvars
               cat backend.tf
               """

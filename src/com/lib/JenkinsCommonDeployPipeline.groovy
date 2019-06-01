@@ -38,57 +38,55 @@ def runPipeline() {
               cp -rf ${common_user} ${WORKSPACE}/fuchicorp-service-account.json
               cp -rf ${deployment_fvars} ${WORKSPACE}/fuchicorp-common-tools.tfvars
               source set-env.sh ./fuchicorp-common-tools.tfvars
-              echo ##################
               cat backend.tf
               """
             }
           }
-       //
-       //    stage('Terraform Apply/Plan') {
-       //      if (!params.terraform_destroy) {
-       //        if (params.terraform_apply) {
-       //
-       //          dir("${WORKSPACE}/") {
-       //            echo "##### Terraform Applying the Changes ####"
-       //            sh 'terraform apply --auto-approve -var-file=$DATAFILE'
-       //          }
-       //
-       //        } else {
-       //
-       //          dir("${WORKSPACE}/") {
-       //            echo "##### Terraform Plan (Check) the Changes #### "
-       //            sh "terraform plan -var-file=$DATAFILE"
-       //          }
-       //        }
-       //      }
-       //    }
-       //    stage('Terraform Destroy') {
-       //      if (!params.terraform_apply) {
-       //        if (params.terraform_destroy) {
-       //          if ( branch != 'tools' ) {
-       //            dir("${WORKSPACE}/") {
-       //              echo "##### Terraform Destroing ####"
-       //              sh 'terraform destroy --auto-approve -var-file=$DATAFILE'
-       //            }
-       //          } else {
-       //            println("""
-       //
-       //              Sorry I can not destroy PROD!!!
-       //              I can Destroy only dev and qa branch
-       //
-       //            """)
-       //          }
-       //        }
-       //     }
-       //
-       //     if (params.terraform_destroy) {
-       //       if (params.terraform_apply) {
-       //         println("""
-       //         Sorry you can not destroy and apply at the same time
-       //         """)
-       //       }
-       //   }
-       // }
+          stage('Terraform Apply/Plan') {
+            if (!params.terraform_destroy) {
+              if (params.terraform_apply) {
+
+                dir("${WORKSPACE}/") {
+                  echo "##### Terraform Applying the Changes ####"
+                  sh 'terraform apply --auto-approve -var-file=$DATAFILE'
+                }
+
+              } else {
+
+                dir("${WORKSPACE}/") {
+                  echo "##### Terraform Plan (Check) the Changes #### "
+                  sh "terraform plan -var-file=$DATAFILE"
+                }
+              }
+            }
+          }
+          stage('Terraform Destroy') {
+            if (!params.terraform_apply) {
+              if (params.terraform_destroy) {
+                if ( branch != 'tools' ) {
+                  dir("${WORKSPACE}/") {
+                    echo "##### Terraform Destroing ####"
+                    sh 'terraform destroy --auto-approve -var-file=$DATAFILE'
+                  }
+                } else {
+                  println("""
+
+                    Sorry I can not destroy PROD!!!
+                    I can Destroy only dev and qa branch
+
+                  """)
+                }
+              }
+           }
+
+           if (params.terraform_destroy) {
+             if (params.terraform_apply) {
+               println("""
+               Sorry you can not destroy and apply at the same time
+               """)
+             }
+         }
+       }
      }
    }
 

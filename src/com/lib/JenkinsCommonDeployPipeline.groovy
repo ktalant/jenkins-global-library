@@ -27,11 +27,10 @@ def runPipeline() {
     //   ]
     //   )])
 
-
       node('master') {
         withCredentials([
           file(credentialsId: "common-tools-tfvars", variable: 'deployment_fvars'),
-          file(credentialsId: "fuchicorp-common-service-account", variable: 'common_user')]) {
+          file(credentialsId: "fuchicorp-google-service-account", variable: 'common_user')]) {
             stage('testing') {
                println("${deployment_fvars.class}")
             }

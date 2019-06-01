@@ -33,6 +33,7 @@ def runPipeline() {
           file(credentialsId: "${common_service_account}", variable: 'common_user')]) {
             stage('testing') {
                println("${deployment_fvars}")
+               sh "ls ${deployment_fvars}"
             }
        //    checkout scm
        //    stage('Terraform init') {

@@ -27,13 +27,14 @@ def runPipeline() {
     //   ]
     //   )])
 
-    withCredentials([
-      file(credentialsId: "common-tools-tfvars", variable: 'deployment_fvars'),
-      file(credentialsId: "fuchicorp-common-service-account", variable: 'common_user')]) {
+
       node('master') {
-        stage('testing') {
-           println("${deployment_fvars.class}")
-        }
+        withCredentials([
+          file(credentialsId: "common-tools-tfvars", variable: 'deployment_fvars'),
+          file(credentialsId: "fuchicorp-common-service-account", variable: 'common_user')]) {
+            stage('testing') {
+               println("${deployment_fvars.class}")
+            }
        //    checkout scm
        //    stage('Terraform init') {
        //      dir("${WORKSPACE}/deployment/terraform") {

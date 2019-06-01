@@ -29,18 +29,18 @@ def runPipeline() {
 
       node('master') {
         withCredentials([
-          file(credentialsId: "common-tools-tfvars", variable: 'deployment_fvars'),
+          file(credentialsId: "${params_tfvars_id}", variable: 'deployment_fvars'),
           file(credentialsId: "${common_service_account}", variable: 'common_user')]) {
             stage('testing') {
                println("${deployment_fvars}")
                sh "ls ${deployment_fvars}"
             }
-       //    checkout scm
-       //    stage('Terraform init') {
-       //      dir("${WORKSPACE}/deployment/terraform") {
-       //        sh "source set-env.sh ${deployment_fvars}"
-       //      }
-       //    }
+          checkout scm
+          stage('Terraform init') {
+            dir("${WORKSPACE}/deployment/terraform") {
+              sh "source set-env.sh ${deployment_fvars}"
+            }
+          }
        //
        //    stage('Terraform Apply/Plan') {
        //      if (!params.terraform_destroy) {

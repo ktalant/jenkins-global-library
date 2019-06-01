@@ -28,7 +28,7 @@ def runPipeline() {
         print('This branch does not supported')
   }
 
-  // try {
+  try {
       node('master') {
         properties([ parameters([
           choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
@@ -114,12 +114,12 @@ def runPipeline() {
        }
      }
 
-  // } catch (e) {
-  //   currentBuild.result = 'FAILURE'
-  //   println("ERROR Detected:")
-  //   println(e.getMessage())
-  //   notifyFailed()
-  // }
+  } catch (e) {
+    currentBuild.result = 'FAILURE'
+    println("ERROR Detected:")
+    println(e.getMessage())
+    notifyFailed()
+  }
 }
 
 def findDockerImages(branchName) {

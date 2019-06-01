@@ -32,7 +32,7 @@ def runPipeline() {
           file(credentialsId: "common-tools-tfvars", variable: 'deployment_fvars'),
           file(credentialsId: "fuchicorp-google-service-account", variable: 'common_user')]) {
             stage('testing') {
-               println("${deployment_fvars.class}")
+               println("${deployment_fvars}")
             }
        //    checkout scm
        //    stage('Terraform init') {

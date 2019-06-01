@@ -27,7 +27,7 @@ def runPipeline() {
       )])
 
     withCredentials([
-      file(credentialsId: "${params_tfvars_id}", variable: 'deployment_fvars'),
+      file(credentialsId: "common-tools-tfvars", variable: 'deployment_fvars'),
       file(credentialsId: "${common_service_account}", variable: 'common_user')]) {
       node('master') {
         stage('testing') {

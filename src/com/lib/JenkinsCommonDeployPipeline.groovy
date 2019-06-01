@@ -36,6 +36,7 @@ def runPipeline() {
               checkout scm
               sh """#!/bin/bash -e
               cat ${deployment_fvars}
+              ls ${deployment_fvars}
               source set-env.sh ${deployment_fvars}
               cat backend.tf
               """

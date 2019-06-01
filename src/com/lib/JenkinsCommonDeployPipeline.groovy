@@ -18,7 +18,7 @@ def runPipeline() {
         print('This branch does not supported')
   }
 
-  try {
+  // try {
     // properties([ parameters([
     //   booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraform_apply'),
     //   booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraform_destroy'),
@@ -90,11 +90,11 @@ def runPipeline() {
      }
    }
 
-  } catch (e) {
-    currentBuild.result = 'FAILURE'
-    println("ERROR Detected:")
-    println(e.getMessage())
-  }
+  // } catch (e) {
+  //   currentBuild.result = 'FAILURE'
+  //   println("ERROR Detected:")
+  //   println(e.getMessage())
+  // }
 }
 
 

@@ -7,7 +7,6 @@ import hudson.FilePath
 def runPipeline() {
 
   def environment = ""
-  def common_script = ""
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
 
   switch(branch) {
@@ -32,17 +31,12 @@ def runPipeline() {
         withCredentials([
           file(credentialsId: "${params_tfvars_id}", variable: 'deployment_fvars'),
           file(credentialsId: "${common_service_account}", variable: 'common_user')]) {
-            stage('Poll Code') {
-              dir("${WORKSPACE}") {
-                checkout scm
-                common_script """
-                set -e
-                cp -rf ${common_user} ${WORKSPACE}"/fuchicorp-service-account.json
-                cp -rf ${deployment_fvars} ${WORKSPACE}"/fuchicorp-common-tools.tfvars
-                source set-env.sh ./fuchicorp-common-tools.tfvars
-                cat backend.tf
-                """
-              }
+            stage('Poll code') {
+              checkout scm
+              sh """#!/bin/bash -e
+              cp -rf ${common_user} ${WORKSPACE}/fuchicorp-service-account.json
+              cp -rf ${deployment_fvars} ${WORKSPACE}/fuchicorp-common-tools.tfvars
+              """
             }
 
           stage('Terraform Apply/Plan') {
@@ -52,7 +46,7 @@ def runPipeline() {
                 dir("${WORKSPACE}/") {
                   echo "##### Terraform Applying the Changes ####"
                   sh """#!/bin/bash -e
-                  ${common_script}
+                  source set-env.sh ./fuchicorp-common-tools.tfvars
                   terraform apply --auto-approve -var-file=$DATAFILE"""
                 }
 
@@ -61,7 +55,7 @@ def runPipeline() {
                 dir("${WORKSPACE}/") {
                   echo "##### Terraform Plan (Check) the Changes #### "
                   sh """#!/bin/bash -e
-                  ${common_script}
+                  source set-env.sh ./fuchicorp-common-tools.tfvars
                   terraform plan -var-file=$DATAFILE"""
                 }
               }
@@ -73,7 +67,8 @@ def runPipeline() {
                 if ( branch != 'tools' ) {
                   dir("${WORKSPACE}/") {
                     echo "##### Terraform Destroing ####"
-                    sh """${common_script}
+                    sh """#!/bin/bash -e
+                    source set-env.sh ./fuchicorp-common-tools.tfvars
                     terraform destroy --auto-approve -var-file=$DATAFILE"""
                   }
                 } else {

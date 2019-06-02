@@ -36,11 +36,11 @@ def runPipeline() {
                 checkout scm
                 def common_script """
                 set -e
-                cp -rf ${common_user} ${WORKSPACE}/fuchicorp-service-account.json
-                cp -rf ${deployment_fvars} ${WORKSPACE}/fuchicorp-common-tools.tfvars
+                cp -rf "${common_user}" "${WORKSPACE}"/fuchicorp-service-account.json
+                cp -rf "${deployment_fvars}" "${WORKSPACE}"/fuchicorp-common-tools.tfvars
                 source set-env.sh ./fuchicorp-common-tools.tfvars
                 cat backend.tf
-                """
+                """;
               }
             }
 

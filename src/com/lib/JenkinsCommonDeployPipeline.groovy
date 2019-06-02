@@ -67,14 +67,14 @@ def runPipeline() {
                 if ( environment != 'tools' ) {
                   dir("${WORKSPACE}/") {
                     echo "##### Terraform Destroing ####"
-                    // sh '''#!/bin/bash -e
-                    // source set-env.sh ./fuchicorp-common-tools.tfvars
-                    // terraform destroy --auto-approve -var-file=$DATAFILE'''
+                    sh '''#!/bin/bash -e
+                    source set-env.sh ./fuchicorp-common-tools.tfvars
+                    terraform destroy --auto-approve -var-file=$DATAFILE'''
                   }
                 } else {
                   println("""
 
-                    Sorry I can not destroy PROD!!!
+                    Sorry I can not destroy Tools!!!
                     I can Destroy only dev and qa branch
 
                   """)

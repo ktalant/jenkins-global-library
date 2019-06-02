@@ -20,7 +20,7 @@ def sendMessage(String type, String status, String channel, String message = nul
         Jenkins Job was successfully built.
         email: fuchicorpsolution@gmail.com
         SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})
-        """
+        """.stripIndent()
       }
 
       break
@@ -32,7 +32,7 @@ def sendMessage(String type, String status, String channel, String message = nul
         Jenkins build is breaking for some reason. Please go to job and take actions.
         email: fuchicorpsolution@gmail.com
         FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-        """
+        """.stripIndent()
       }
       break
 
@@ -43,7 +43,7 @@ def sendMessage(String type, String status, String channel, String message = nul
         Please add let team know if this is mistake or please send an email
         email: fuchicorpsolution@gmail.com
         STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}).
-        """
+        """.stripIndent()
       }
       break
   }

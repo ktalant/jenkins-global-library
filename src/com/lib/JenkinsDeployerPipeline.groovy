@@ -40,7 +40,7 @@ def runPipeline() {
           )])
 
           checkout scm
-          messanger.sendMessage("slack", "STARED", "#devops")
+          messanger.sendMessage("slack", "STARED", slackChannel)
 
           stage('Generate Vars') {
             def file = new File("${WORKSPACE}/deployment/terraform/webplatform.tfvars")
@@ -68,7 +68,7 @@ def runPipeline() {
                 dir("${WORKSPACE}/deployment/terraform") {
                   echo "##### Terraform Applying the Changes #####"
                   sh "terraform apply --auto-approve -var-file=webplatform.tfvars"
-                  messanger.sendMessage("slack", "APPLYED", "#devops")
+                  messanger.sendMessage("slack", "APPLYED", slackChannel)
                 }
 
               } else {
@@ -76,7 +76,7 @@ def runPipeline() {
                   dir("${WORKSPACE}/deployment/terraform") {
                     echo "##### Terraform Plan (Check) the Changes #####"
                     sh "terraform plan -var-file=webplatform.tfvars"
-                    messanger.sendMessage("slack", "PLANED", "#devops")
+                    messanger.sendMessage("slack", "PLANED", slackChannel)
                   }
 
               }
@@ -89,7 +89,7 @@ def runPipeline() {
                   dir("${WORKSPACE}/deployment/terraform") {
                     echo "##### Terraform Destroing #####"
                     sh "terraform destroy --auto-approve -var-file=webplatform.tfvars"
-                    messanger.sendMessage("slack", "DESTROYED", "#devops")
+                    messanger.sendMessage("slack", "DESTROYED", slackChannel)
                   }
                 } else {
                   println("""
@@ -116,7 +116,7 @@ def runPipeline() {
     currentBuild.result = 'FAILURE'
     println("ERROR Detected:")
     println(e.getMessage())
-    messanger.sendMessage("slack", "FAILURE", "#devops")
+    messanger.sendMessage("slack", "FAILURE", slackChannel)
   }
 }
 

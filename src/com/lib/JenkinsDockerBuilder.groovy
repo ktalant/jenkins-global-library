@@ -17,6 +17,8 @@ def runPipeline() {
 
 
   def commonDeployer = new com.lib.JenkinsDeployerPipeline()
+  def messanger = new com.lib.JenkinsNotificator()
+  def slackChannel = "devops"
 
   def repositoryName = "webplatform"
   def dockerImage
@@ -42,6 +44,7 @@ def runPipeline() {
         repositoryName = null
         currentBuild.result = 'FAILURE'
         print('You are using unsupported branch name')
+        messanger.sendMessage("slack", "FAILURE", slackChannel)
   }
 
 
@@ -60,7 +63,7 @@ def runPipeline() {
       checkout scm
 
 
-
+      messanger.sendMessage("slack", "STARED", slackChannel)
       stage('Build docker image') {
 
           // Build the docker image
@@ -72,9 +75,13 @@ def runPipeline() {
          // Push image to the Nexus with new release
           docker.withRegistry('https://docker.fuchicorp.com', 'nexus-private-admin-credentials') {
               dockerImage.push("0.${BUILD_NUMBER}")
+              messanger.sendMessage("slack", "SUCCESS", slackChannel)
 
 
               if (params.PUSH_LATEST) {
+                messanger.sendMessage("slack", "PUSHED", slackChannel, """###############
+                This Job pushed to latest version.
+                ###############""".stripIndent())
                 dockerImage.push("latest")
             }
           }
@@ -91,6 +98,7 @@ def runPipeline() {
     currentBuild.result = 'FAILURE'
     println("ERROR Detected:")
     println(e.getMessage())
+    messanger.sendMessage("slack", "FAILURE", slackChannel)
   }
 }
 

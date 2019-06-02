@@ -34,7 +34,8 @@ def runPipeline() {
             stage('Poll Code') {
               dir("${WORKSPACE}") {
                 checkout scm
-                def common_script """#!/bin/bash -e
+                def common_script """
+                set -e
                 cp -rf ${common_user} ${WORKSPACE}/fuchicorp-service-account.json
                 cp -rf ${deployment_fvars} ${WORKSPACE}/fuchicorp-common-tools.tfvars
                 source set-env.sh ./fuchicorp-common-tools.tfvars
@@ -49,7 +50,8 @@ def runPipeline() {
 
                 dir("${WORKSPACE}/") {
                   echo "##### Terraform Applying the Changes ####"
-                  sh """${common_script}
+                  sh """#!/bin/bash -e
+                  ${common_script}
                   terraform apply --auto-approve -var-file=$DATAFILE"""
                 }
 
@@ -57,7 +59,8 @@ def runPipeline() {
 
                 dir("${WORKSPACE}/") {
                   echo "##### Terraform Plan (Check) the Changes #### "
-                  sh """${common_script}
+                  sh """#!/bin/bash -e
+                  ${common_script}
                   terraform plan -var-file=$DATAFILE"""
                 }
               }

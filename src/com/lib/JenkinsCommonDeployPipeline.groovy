@@ -7,6 +7,7 @@ import hudson.FilePath
 def runPipeline() {
 
   def environment = ""
+  def common_script = ""
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
 
   switch(branch) {
@@ -34,13 +35,13 @@ def runPipeline() {
             stage('Poll Code') {
               dir("${WORKSPACE}") {
                 checkout scm
-                def common_script """
+                common_script """
                 set -e
-                cp -rf "${common_user}" "${WORKSPACE}"/fuchicorp-service-account.json
-                cp -rf "${deployment_fvars}" "${WORKSPACE}"/fuchicorp-common-tools.tfvars
+                cp -rf ${common_user} ${WORKSPACE}"/fuchicorp-service-account.json
+                cp -rf ${deployment_fvars} ${WORKSPACE}"/fuchicorp-common-tools.tfvars
                 source set-env.sh ./fuchicorp-common-tools.tfvars
                 cat backend.tf
-                """;
+                """
               }
             }
 

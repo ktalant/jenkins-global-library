@@ -79,9 +79,8 @@ def runPipeline() {
 
 
               if (params.PUSH_LATEST) {
-                messanger.sendMessage("slack", "PUSHED", slackChannel, """###############
-                This Job pushed to latest version.
-                ###############""".stripIndent())
+                messanger.sendMessage("slack", "PUSHED", slackChannel,
+                """############### This Job pushed to latest version. ###############""".stripIndent())
                 dockerImage.push("latest")
             }
           }

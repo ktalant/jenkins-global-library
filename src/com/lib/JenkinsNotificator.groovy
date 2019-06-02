@@ -5,7 +5,6 @@ package com.lib
 
 def sendMessage(String type, String status, String channel, String message = null) {
   String color        = ""
-  String message      = ""
   String slackUrl     = "https://fuchicorp.slack.com/services/hooks/jenkins-ci/"
   String slackToken   = "slack-token"
 

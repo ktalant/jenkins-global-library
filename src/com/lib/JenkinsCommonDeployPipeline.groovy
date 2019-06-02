@@ -18,7 +18,7 @@ def runPipeline() {
         print('This branch does not supported')
   }
 
-  // try {
+  try {
     properties([ parameters([
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraform_apply'),
       booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraform_destroy'),
@@ -45,9 +45,9 @@ def runPipeline() {
 
                 dir("${WORKSPACE}/") {
                   echo "##### Terraform Applying the Changes ####"
-                  sh """#!/bin/bash -e
+                  sh '''#!/bin/bash -e
                   source set-env.sh ./fuchicorp-common-tools.tfvars
-                  terraform apply --auto-approve -var-file=$DATAFILE"""
+                  terraform apply --auto-approve -var-file=$DATAFILE'''
                 }
 
               } else {
@@ -93,11 +93,11 @@ def runPipeline() {
      }
    }
 
-  // } catch (e) {
-  //   currentBuild.result = 'FAILURE'
-  //   println("ERROR Detected:")
-  //   println(e.getMessage())
-  // }
+  } catch (e) {
+    currentBuild.result = 'FAILURE'
+    println("ERROR Detected:")
+    println(e.getMessage())
+  }
 }
 
 

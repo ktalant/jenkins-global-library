@@ -15,7 +15,7 @@ def sendMessage(String type, String status, String channel, String message = nul
   switch(status) {
     case "SUCCESS":
       color = "#00FF00"
-      if (message != null ) {
+      if (message == null ) {
         message = """
         Jenkins Job was successfully built.
         email: fuchicorpsolution@gmail.com
@@ -27,7 +27,7 @@ def sendMessage(String type, String status, String channel, String message = nul
 
     case "FAILURE":
       color = "#FF0000"
-      if (message != null ) {
+      if (message == null ) {
         message = """
         Jenkins build is breaking for some reason. Please go to job and take actions.
         email: fuchicorpsolution@gmail.com
@@ -38,7 +38,7 @@ def sendMessage(String type, String status, String channel, String message = nul
 
     default:
       color = "#FFFF00"
-      if (message != null ) {
+      if (message == null ) {
         message = """
         Please add let team know if this is mistake or please send an email
         email: fuchicorpsolution@gmail.com

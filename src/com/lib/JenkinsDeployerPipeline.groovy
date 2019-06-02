@@ -5,8 +5,11 @@ import groovy.json.JsonSlurper
 
 def runPipeline() {
 
+  def messanger = new com.lib.JenkinsNotificator()
   def environment = ""
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
+
+
 
   salckChannel = 'devops'
   slackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
@@ -42,7 +45,8 @@ def runPipeline() {
           )])
 
           checkout scm
-          notifyStarted()
+          // notifyStarted()
+          messanger.sendMessage("slack", "SUCCESS", "#devops", "message example ")
 
           stage('Generate Vars') {
             def file = new File("${WORKSPACE}/deployment/terraform/webplatform.tfvars")

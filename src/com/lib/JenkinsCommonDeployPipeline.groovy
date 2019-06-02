@@ -85,7 +85,9 @@ def runPipeline() {
            if (params.terraform_destroy) {
              if (params.terraform_apply) {
                println("""
+
                Sorry you can not destroy and apply at the same time
+               
                """)
              }
          }

@@ -3,7 +3,7 @@
 package com.lib
 
 
-Object sendMessage(String type, String message, String status, String channel) {
+def sendMessage(String type, String message, String status, String channel) {
   String color        = ""
   String slackUrl     = "https://fuchicorp.slack.com/services/hooks/jenkins-ci/"
   String slackToken   = "slack-token"

@@ -36,7 +36,6 @@ def runPipeline() {
           string( defaultValue: 'webplatform', name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name'),
           string(defaultValue: 'webplatformUser',  name: 'mysql_user',description: 'Please enter a username for MySQL', trim: true),
           string(defaultValue: 'webplatformPassword',  name: 'mysql_password',description: 'Please enter a password for MySQL', trim: true)
-
           ]
           )])
 
@@ -67,7 +66,7 @@ def runPipeline() {
               if (params.terraformApply) {
 
                 dir("${WORKSPACE}/deployment/terraform") {
-                  echo "##### Terraform Applying the Changes ####"
+                  echo "##### Terraform Applying the Changes #####"
                   sh "terraform apply --auto-approve -var-file=webplatform.tfvars"
                   messanger.sendMessage("slack", "APPLYED", "#devops")
                 }
@@ -75,7 +74,7 @@ def runPipeline() {
               } else {
 
                   dir("${WORKSPACE}/deployment/terraform") {
-                    echo "##### Terraform Plan (Check) the Changes #### "
+                    echo "##### Terraform Plan (Check) the Changes #####"
                     sh "terraform plan -var-file=webplatform.tfvars"
                     messanger.sendMessage("slack", "PLANED", "#devops")
                   }
@@ -88,7 +87,7 @@ def runPipeline() {
               if (params.terraformDestroy) {
                 if ( branch == 'dev' || branch == 'qa' ) {
                   dir("${WORKSPACE}/deployment/terraform") {
-                    echo "##### Terraform Destroing ####"
+                    echo "##### Terraform Destroing #####"
                     sh "terraform destroy --auto-approve -var-file=webplatform.tfvars"
                     messanger.sendMessage("slack", "DESTROYED", "#devops")
                   }

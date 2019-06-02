@@ -14,7 +14,7 @@ def sendMessage(String type, String status, String channel, String message = nul
 
   switch(status) {
     case "SUCCESS":
-      color = "#00FF00"
+      color = "#00ff72"
       if (message == null ) {
         message = """
         Jenkins Job was successfully built.
@@ -43,6 +43,38 @@ def sendMessage(String type, String status, String channel, String message = nul
         STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}).
         """.stripIndent()   }
       break
+
+    case "PLANED":
+      color = "#00ffbf"
+      if (message == null ) {
+        message = """
+        ##### Terraform Plan (Check) the Changes #####
+        email: fuchicorpsolution@gmail.com
+        PLANED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}).
+        """.stripIndent()   }
+      break
+
+    case "APPLYED":
+      color = "#ffd000"
+      if (message == null ) {
+        message = """
+        ##### Terraform Applying the Changes #####
+        email: fuchicorpsolution@gmail.com
+        APPLYED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}).
+        """.stripIndent()   }
+      break
+
+    case "DESTROYED":
+      color = "#ff0000"
+      if (message == null ) {
+        message = """
+        ##### Terraform Destroing #####
+        email: fuchicorpsolution@gmail.com
+        DESTROYED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}).
+        """.stripIndent()   }
+      break
+
+
 
     default:
       color = "#00f6ff"

@@ -46,7 +46,7 @@ def runPipeline() {
 
           checkout scm
           // notifyStarted()
-          messanger.sendMessage("slack", "SUCCESS", "#devops", "message example ")
+          messanger.sendMessage("slack", "STARED", "#devops")
 
           stage('Generate Vars') {
             def file = new File("${WORKSPACE}/deployment/terraform/webplatform.tfvars")
@@ -74,7 +74,7 @@ def runPipeline() {
                 dir("${WORKSPACE}/deployment/terraform") {
                   echo "##### Terraform Applying the Changes ####"
                   sh "terraform apply --auto-approve -var-file=webplatform.tfvars"
-                  notifySuccessful()
+                  // notifySuccessful()
                 }
 
               } else {
@@ -82,7 +82,7 @@ def runPipeline() {
                   dir("${WORKSPACE}/deployment/terraform") {
                     echo "##### Terraform Plan (Check) the Changes #### "
                     sh "terraform plan -var-file=webplatform.tfvars"
-                    notifySuccessful()
+                    // notifySuccessful()
                   }
 
               }
@@ -95,7 +95,7 @@ def runPipeline() {
                   dir("${WORKSPACE}/deployment/terraform") {
                     echo "##### Terraform Destroing ####"
                     sh "terraform destroy --auto-approve -var-file=webplatform.tfvars"
-                    notifySuccessful()
+                    // notifySuccessful()
                   }
                 } else {
                   println("""

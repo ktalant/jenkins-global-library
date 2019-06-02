@@ -54,9 +54,9 @@ def runPipeline() {
 
                 dir("${WORKSPACE}/") {
                   echo "##### Terraform Plan (Check) the Changes #### "
-                  sh """#!/bin/bash -e
+                  sh '''#!/bin/bash -e
                   source set-env.sh ./fuchicorp-common-tools.tfvars
-                  terraform plan -var-file=$DATAFILE"""
+                  terraform plan -var-file=$DATAFILE'''
                 }
               }
             }
@@ -67,9 +67,9 @@ def runPipeline() {
                 if ( branch != 'tools' ) {
                   dir("${WORKSPACE}/") {
                     echo "##### Terraform Destroing ####"
-                    sh """#!/bin/bash -e
+                    sh '''#!/bin/bash -e
                     source set-env.sh ./fuchicorp-common-tools.tfvars
-                    terraform destroy --auto-approve -var-file=$DATAFILE"""
+                    terraform destroy --auto-approve -var-file=$DATAFILE'''
                   }
                 } else {
                   println("""

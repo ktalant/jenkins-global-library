@@ -5,25 +5,21 @@ import groovy.json.JsonSlurper
 
 def runPipeline() {
 
-  def messanger = new com.lib.JenkinsNotificator()
+
   def environment = ""
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
-
-
-
-  salckChannel = 'devops'
-  slackUrl = 'https://fuchicorp.slack.com/services/hooks/jenkins-ci/'
-  slackTokenId = 'slack-token'
+  def messanger = new com.lib.JenkinsNotificator()
+  def slackChannel = "devops"
 
   switch(branch) {
-    case 'master': environment = 'prod'
-    branch = 'prod'
+    case "master": environment = "prod"
+    branch = "prod"
     break
 
-    case 'qa': environment = 'qa'
+    case "qa": environment = "qa"
     break
 
-    case 'dev': environment = 'dev'
+    case "dev": environment = "dev"
     break
 
     default:
@@ -45,7 +41,6 @@ def runPipeline() {
           )])
 
           checkout scm
-          // notifyStarted()
           messanger.sendMessage("slack", "STARED", "#devops")
 
           stage('Generate Vars') {
@@ -74,7 +69,7 @@ def runPipeline() {
                 dir("${WORKSPACE}/deployment/terraform") {
                   echo "##### Terraform Applying the Changes ####"
                   sh "terraform apply --auto-approve -var-file=webplatform.tfvars"
-                  // notifySuccessful()
+                  messanger.sendMessage("slack", "APPLYED", "#devops")
                 }
 
               } else {
@@ -82,7 +77,7 @@ def runPipeline() {
                   dir("${WORKSPACE}/deployment/terraform") {
                     echo "##### Terraform Plan (Check) the Changes #### "
                     sh "terraform plan -var-file=webplatform.tfvars"
-                    // notifySuccessful()
+                    messanger.sendMessage("slack", "PLANED", "#devops")
                   }
 
               }
@@ -95,7 +90,7 @@ def runPipeline() {
                   dir("${WORKSPACE}/deployment/terraform") {
                     echo "##### Terraform Destroing ####"
                     sh "terraform destroy --auto-approve -var-file=webplatform.tfvars"
-                    // notifySuccessful()
+                    messanger.sendMessage("slack", "DESTROYED", "#devops")
                   }
                 } else {
                   println("""
@@ -122,7 +117,7 @@ def runPipeline() {
     currentBuild.result = 'FAILURE'
     println("ERROR Detected:")
     println(e.getMessage())
-    notifyFailed()
+    messanger.sendMessage("slack", "FAILURE", "#devops")
   }
 }
 
@@ -142,37 +137,6 @@ def findDockerImages(branchName) {
   }
 
   return versionList
-}
-
-
-def notifyStarted() {
-    slackSend (channel: "${salckChannel}", color: '#FFFF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
-    message: """
-    Please add let team know if this is mistake or please send an email
-    email: fuchicorpsolution@gmail.com
-    STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}).
-    """)
-
-}
-
-def notifySuccessful() {
-    slackSend (channel: "${salckChannel}", color: '#00FF00', baseUrl : "${slackUrl}".toString(), tokenCredentialId: "${slackTokenId}".toString(),
-    message: """
-    Jenkins Job was successfully built.
-    email: fuchicorpsolution@gmail.com
-    SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})
-    """)
-
-}
-
-def notifyFailed() {
-    slackSend (channel: "${salckChannel}", color: '#FF0000', baseUrl : "${slackUrl}".toString(),  tokenCredentialId: "${slackTokenId}".toString(),
-    message: """
-    Jenkins build is breaking for some reason. Please go to job and take actions.
-    email: fuchicorpsolution@gmail.com
-    FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-    """)
-
 }
 
 return this

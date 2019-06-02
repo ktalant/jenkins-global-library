@@ -48,6 +48,9 @@ def sendMessage(String type, String status, String channel, String message = nul
       break
   }
 
+  println(message)
+  println(message.class)
+
   switch(type) {
     case "slack":
       slackSend(channel: channel, color: color, baseUrl: slackUrl, tokenCredentialId: slackToken, message: message)

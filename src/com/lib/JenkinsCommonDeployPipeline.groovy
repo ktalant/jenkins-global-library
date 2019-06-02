@@ -64,7 +64,7 @@ def runPipeline() {
           stage('Terraform Destroy') {
             if (!params.terraform_apply) {
               if (params.terraform_destroy) {
-                if ( branch != 'tools' ) {
+                if ( environment != 'tools' ) {
                   dir("${WORKSPACE}/") {
                     echo "##### Terraform Destroing ####"
                     // sh '''#!/bin/bash -e

@@ -19,7 +19,7 @@ def sendMessage(String type, String status, String channel, String message = nul
         message = """
         Jenkins Job was successfully built.
         email: fuchicorpsolution@gmail.com
-        SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})
+        SUCCESS: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})
         """.stripIndent()
       }
       break

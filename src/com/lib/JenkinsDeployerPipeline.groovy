@@ -31,7 +31,7 @@ def runPipeline() {
       existingBranchedDockerImages = findDockerImages(branch)
       node('master') {
         properties([ parameters([
-          choice(name: 'SelectedDockerImage', choices: existingBranchedDockerImages, description: 'Please select docker image to deploy!'),
+          choice(name: 'SelectedDockerImage', choices: [existingBranchedDockerImages], description: 'Please select docker image to deploy!'),
           booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
           booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraformDestroy'),
           string( defaultValue: 'webplatform', name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name'),

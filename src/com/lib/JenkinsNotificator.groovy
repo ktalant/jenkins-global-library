@@ -54,13 +54,13 @@ def sendMessage(String type, String status, String channel, String message = nul
         """.stripIndent()   }
       break
 
-    case "APPLYED":
+    case "APPLIED":
       color = "#ffd000"
       if (message == null ) {
         message = """
         ##### Terraform Applying the Changes #####
         email: fuchicorpsolution@gmail.com
-        APPLYED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}).
+        APPLIED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}).
         """.stripIndent()   }
       break
 

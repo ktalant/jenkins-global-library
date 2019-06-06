@@ -68,7 +68,7 @@ def runPipeline() {
                 dir("${WORKSPACE}/deployment/terraform") {
                   echo "##### Terraform Applying the Changes #####"
                   sh "terraform apply --auto-approve -var-file=webplatform.tfvars"
-                  messanger.sendMessage("slack", "APPLYED", slackChannel)
+                  messanger.sendMessage("slack", "APPLIED", slackChannel)
                 }
 
               } else {

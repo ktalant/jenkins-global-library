@@ -97,7 +97,9 @@ def runPipeline() {
                 if ( branch == 'dev' || branch == 'qa' ) {
                   dir("${WORKSPACE}/deployment/terraform") {
                     echo "##### Terraform Destroing #####"
-                    sh "terraform destroy --auto-approve -var-file=webplatform.tfvars"
+                    sh '''#!/bin/bash -e
+                    source set-env.sh ./webplatform.tfvars
+                    terraform destroy --auto-approve -var-file=$DATAFILE'''
                     messanger.sendMessage("slack", "DESTROYED", slackChannel)
                   }
                 } else {

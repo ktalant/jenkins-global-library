@@ -28,19 +28,26 @@ def runPipeline() {
   }
 
   try {
-      node('master') {
-        properties([ parameters([
-          choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
-          booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
-          booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraformDestroy'),
-          string( defaultValue: 'webplatform', name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name'),
-          string(defaultValue: 'webplatformUser',  name: 'mysql_user',description: 'Please enter a username for MySQL', trim: true),
-          string(defaultValue: 'webplatformPassword',  name: 'mysql_password',description: 'Please enter a password for MySQL', trim: true)
-          ]
-          )])
+    properties([ parameters([
+      choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
+      booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
+      booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraformDestroy'),
+      string( defaultValue: 'webplatform', name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name'),
+      string(defaultValue: 'webplatformUser',  name: 'mysql_user',description: 'Please enter a username for MySQL', trim: true),
+      string(defaultValue: 'webplatformPassword',  name: 'mysql_password',description: 'Please enter a password for MySQL', trim: true)
+      ]
+      )])
 
-          checkout scm
-          messanger.sendMessage("slack", "STARED", slackChannel)
+      node('master') {
+        withCredentials([
+          file(credentialsId: "${common_service_account}", variable: 'common_user')]) {
+            messanger.sendMessage("slack", "STARED", slackChannel)
+            stage('Poll code') {
+              checkout scm
+              sh """#!/bin/bash -e
+              cp -rf ${common_user} ${WORKSPACE}/fuchicorp-service-account.json
+              """
+            }
 
           stage('Generate Vars') {
             def file = new File("${WORKSPACE}/deployment/terraform/webplatform.tfvars")
@@ -52,13 +59,8 @@ def runPipeline() {
             webplatform_password      =  "${mysql_password}"
             webplatform_image         =  "docker.fuchicorp.com/${SelectedDockerImage}"
             environment               =  "${environment}"
+            credentials               =  "./fuchicorp-service-account.json"
             """
-          }
-
-          stage('Terraform init') {
-            dir("${WORKSPACE}/deployment/terraform") {
-              sh "terraform init"
-            }
           }
 
           stage('Terraform Apply/Plan') {
@@ -66,8 +68,10 @@ def runPipeline() {
               if (params.terraformApply) {
 
                 dir("${WORKSPACE}/deployment/terraform") {
-                  echo "##### Terraform Applying the Changes #####"
-                  sh "terraform apply --auto-approve -var-file=webplatform.tfvars"
+                  echo "##### Terraform Applying the Changes ####"
+                  sh """#!/bin/bash -e
+                  source set-env.sh ${WORKSPACE}/deployment/terraform/webplatform.tfvars
+                  terraform apply --auto-approve -var-file=\$DATAFILE"""
                   messanger.sendMessage("slack", "APPLIED", slackChannel)
                 }
 
@@ -75,7 +79,9 @@ def runPipeline() {
 
                   dir("${WORKSPACE}/deployment/terraform") {
                     echo "##### Terraform Plan (Check) the Changes #####"
-                    sh "terraform plan -var-file=webplatform.tfvars"
+                    sh """#!/bin/bash -e
+                    source set-env.sh ${WORKSPACE}/deployment/terraform/webplatform.tfvars
+                    terraform plan -var-file=\$DATAFILE"""
                     messanger.sendMessage("slack", "PLANED", slackChannel)
                   }
 
@@ -111,6 +117,7 @@ def runPipeline() {
          }
        }
      }
+   }
 
   } catch (e) {
     currentBuild.result = 'FAILURE'

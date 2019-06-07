@@ -61,6 +61,7 @@ def runPipeline() {
             webplatform_image         =  "docker.fuchicorp.com/${SelectedDockerImage}"
             environment               =  "${environment}"
             credentials               =  "./fuchicorp-service-account.json"
+            deployment_name           =  "webplatform"
             """.stripIndent()
           }
 

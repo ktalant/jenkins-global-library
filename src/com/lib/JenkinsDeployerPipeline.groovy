@@ -150,7 +150,7 @@ def findDockerImages(branchName) {
   }
 
 
-  return versionList
+  return versionList.sort()
 }
 
 return this

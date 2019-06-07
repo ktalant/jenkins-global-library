@@ -46,7 +46,7 @@ def runPipeline() {
             stage('Poll code') {
               checkout scm
               sh """#!/bin/bash -e
-              cp -rf ${common_user} ${WORKSPACE}/fuchicorp-service-account.json
+              cp -rf ${common_user} ${WORKSPACE}/deployment/terraform/fuchicorp-service-account.json
               """
             }
 

@@ -70,9 +70,9 @@ def runPipeline() {
 
                 dir("${WORKSPACE}/deployment/terraform") {
                   echo "##### Terraform Applying the Changes ####"
-                  sh """#!/bin/bash -e
+                  sh '''#!/bin/bash -e
                   source set-env.sh ${WORKSPACE}/deployment/terraform/webplatform.tfvars
-                  terraform apply --auto-approve -var-file=\$DATAFILE"""
+                  terraform apply --auto-approve -var-file=$DATAFILE'''
                   messanger.sendMessage("slack", "APPLIED", slackChannel)
                 }
 
@@ -80,9 +80,9 @@ def runPipeline() {
 
                   dir("${WORKSPACE}/deployment/terraform") {
                     echo "##### Terraform Plan (Check) the Changes #####"
-                    sh """#!/bin/bash -e
+                    sh '''#!/bin/bash -e
                     source set-env.sh ${WORKSPACE}/deployment/terraform/webplatform.tfvars
-                    terraform plan -var-file=\$DATAFILE"""
+                    terraform plan -var-file=$DATAFILE'''
                     messanger.sendMessage("slack", "PLANED", slackChannel)
                   }
 

@@ -80,7 +80,7 @@ def runPipeline() {
 
                   dir("${WORKSPACE}/deployment/terraform") {
                     echo "##### Terraform Plan (Check) the Changes #####"
-                    sh "./webplatform.tfvars"
+                    sh "cat ./webplatform.tfvars"
                     sh '''#!/bin/bash -e
                     source set-env.sh ./webplatform.tfvars
                     terraform plan -var-file=$DATAFILE'''

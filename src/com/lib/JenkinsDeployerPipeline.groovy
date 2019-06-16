@@ -13,7 +13,6 @@ def runPipeline() {
   def slackChannel  = "devops"
   def branchName    = "${scm.branches[0].name}".replaceAll(/^\*\//, '')
   String dateTime   = new SimpleDateFormat("yyyy/MM/dd.HH-mm-ss").format(Calendar.getInstance().getTime())
-  String repoUrl    = "${scm.getUserRemoteConfigs()[0].getUrl()}"
   def credId        = scm.getUserRemoteConfigs()[0].getCredentialsId()
   String repoUrl = scm.getUserRemoteConfigs()[0].getUrl().replace('https://', '')
 

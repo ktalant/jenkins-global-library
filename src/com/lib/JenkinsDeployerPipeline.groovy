@@ -14,6 +14,8 @@ def runPipeline() {
   def branchName    = "${scm.branches[0].name}".replaceAll(/^\*\//, '')
   String dateTime   = new SimpleDateFormat("yyyy/MM/dd.HH-mm-ss").format(Calendar.getInstance().getTime())
   String repoUrl    = "${scm.getUserRemoteConfigs()[0].getUrl()}"
+  def credId        = scm.getUserRemoteConfigs()[0].getCredentialsId()
+  String repoUrl = scm.getUserRemoteConfigs()[0].getUrl().replace('https://', '')
 
   switch(branch) {
     case "master": environment = "prod"
@@ -82,17 +84,18 @@ def runPipeline() {
                 }
                 if (branch == 'prod') {
                   sh("""
-                    git config --global user.email 'devops@capgemini.com'
-                    git config --global user.name  'devops'
+                    git config --global user.email 'jenkins@fuchicorp.com'
+                    git config --global user.name  'Jenkins'
                     git config --global credential.helper cache
                     """)
-                    checkout scm
                     tagForGit = "deploy_prod_${dateTime}"
                     sh("git clone ${repoUrl} ${WORKSPACE}/git_tagger")
+                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "${credId}", usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
                     dir("${WORKSPACE}/git_tagger") {
                       sh("""git tag -a '${tagForGit}' -m 'Jenkins deployment has been deployed successfully. time: ${dateTime}'
-                      git push origin --tags """)
+                      git push https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@${repoUrl} --tags""")
                     }
+                  }
                 }
 
 

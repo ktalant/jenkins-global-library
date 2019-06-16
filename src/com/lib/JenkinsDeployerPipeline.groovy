@@ -94,6 +94,7 @@ def runPipeline() {
                       sh("""git tag -a '${tagForGit}' -m 'Jenkins deployment has been deployed successfully. time: ${dateTime}'
                       git push https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@${repoUrl} --tags""")
                     }
+                    sh("rm -rf ${WORKSPACE}/git_tagger")
                   }
                 }
 

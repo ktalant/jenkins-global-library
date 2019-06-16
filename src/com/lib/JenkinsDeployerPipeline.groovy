@@ -6,10 +6,13 @@ import groovy.json.JsonSlurper
 def runPipeline() {
 
 
-  def environment = ""
-  def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
-  def messanger = new com.lib.JenkinsNotificator()
-  def slackChannel = "devops"
+  def environment   = ""
+  def branch        = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
+  def messanger     = new com.lib.JenkinsNotificator()
+  def slackChannel  = "devops"
+  def branchName    = "${scm.branches[0].name}".replaceAll(/^\*\//, '')
+  String dateTime   = new SimpleDateFormat("yyyy/MM/dd.HH-mm-ss").format(Calendar.getInstance().getTime())
+  String repoUrl    = "${scm.getUserRemoteConfigs()[0].getUrl()}"
 
   switch(branch) {
     case "master": environment = "prod"
@@ -76,6 +79,22 @@ def runPipeline() {
                   terraform apply --auto-approve -var-file=$DATAFILE'''
                   messanger.sendMessage("slack", "APPLIED", slackChannel)
                 }
+                if (branch == 'prod') {
+                  sh("""
+                    git config --global user.email 'devops@capgemini.com'
+                    git config --global user.name  'devops'
+                    git config --global credential.helper cache
+                    """)
+                    checkout scm
+                    tagForGit = "deploy_prod_${dateTime}"
+                    sh("git clone ${repoUrl} ${WORKSPACE}/git_tagger")
+                    dir("${WORKSPACE}/git_tagger") {
+                      sh("""git tag -a '${tagForGit}' -m 'Jenkins deployment has been deployed successfully. time: ${dateTime}'
+                      git push origin --tags """)
+                    }
+                }
+
+
 
               } else {
 

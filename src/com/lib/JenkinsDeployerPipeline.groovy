@@ -88,7 +88,7 @@ def runPipeline() {
                     git config --global credential.helper cache
                     """)
                     tagForGit = "deploy_prod_${dateTime}"
-                    sh("git clone ${repoUrl} ${WORKSPACE}/git_tagger")
+                    sh("git clone http://${repoUrl} ${WORKSPACE}/git_tagger")
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "${credId}", usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
                     dir("${WORKSPACE}/git_tagger") {
                       sh("""git tag -a '${tagForGit}' -m 'Jenkins deployment has been deployed successfully. time: ${dateTime}'

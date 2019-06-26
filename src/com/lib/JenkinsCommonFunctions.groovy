@@ -6,15 +6,16 @@ def scheduleBaseJobs(String baseName, String jobName) {
   * scheduleBaseJobs schedule the job to run from 1 through 6
   */
 
-  if (baseName.contains('base')  {
+  if (baseName.contains('base'))  {
     if (jobName == 'master' || jobName == 'develop') {
-      println('Condition is working')
+      properties([[$class: 'RebuildSettings',
+      autoRebuild: false,
+      rebuildDisabled: false],
+      // “At minute 0 past every hour from 1 through 6.”
+      pipelineTriggers([cron('0 1-6 * * *')])])
     }
   }
 }
-
-
-// '0 1-6 * * *'
 
 
 

@@ -8,14 +8,13 @@ def scheduleBaseJobs(String baseName, String jobName) {
 
   if (baseName.contains('base')  {
     if (jobName == 'master' || jobName == 'develop') {
-      properties([[$class: 'RebuildSettings',
-      autoRebuild: false,
-      rebuildDisabled: false],
-      // “At minute 0 past every hour from 1 through 6.”
-      pipelineTriggers([cron('0 1-6 * * *')])])
+      println('Condition is working')
     }
   }
 }
+
+
+// '0 1-6 * * *'
 
 
 

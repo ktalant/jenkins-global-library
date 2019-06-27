@@ -21,6 +21,7 @@ def runPipeline() {
   def slackChannel = "devops"
   def repositoryName = "${JOB_NAME}"
       .split('/')[0]
+      .replace('-fuchicorp', '')
       .replace('-build', '')
       .replace('-deploy', '')
   def dockerImage

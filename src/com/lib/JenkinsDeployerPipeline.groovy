@@ -180,7 +180,9 @@ def findDockerImages(branchName) {
     }
 
   }
-
+  if(!versionList) {
+    versionList.add('ImmageNotFound')
+  }
 
   return versionList.sort()
 }

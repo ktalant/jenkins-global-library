@@ -19,7 +19,10 @@ def runPipeline() {
   def commonDeployer = new com.lib.JenkinsDeployerPipeline()
   def messanger = new com.lib.JenkinsNotificator()
   def slackChannel = "devops"
-  def repositoryName = "${JOB_NAME}".split('/')[0]
+  def repositoryName = "${JOB_NAME}"
+      .split('/')[0]
+      .replace('-build', '')
+      .replace('-deploy', '')
   def dockerImage
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
 

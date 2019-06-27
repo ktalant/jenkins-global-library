@@ -35,6 +35,7 @@ def runPipeline() {
   try {
     properties([ parameters([
       choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
+      choice(name: 'ApiSelectedDockerImage', choices: ['api-platform-prod:0.1'], description: 'Please select docker image for api!'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
       booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraformDestroy'),
       string( defaultValue: 'webplatform', name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name'),
@@ -64,6 +65,7 @@ def runPipeline() {
             webplatform_namespace     =  "${environment}"
             webplatform_password      =  "${mysql_password}"
             webplatform_image         =  "docker.fuchicorp.com/${SelectedDockerImage}"
+            api_platform_image        =  "docker.fuchicorp.com/${ApiSelectedDockerImage}"
             environment               =  "${environment}"
             credentials               =  "./fuchicorp-service-account.json"
             deployment_name           =  "webplatform"

@@ -165,6 +165,11 @@ def findDockerImages(branchName) {
   def token       = ""
   def myJsonreader = new JsonSlurper()
   def nexusData = myJsonreader.parse(new URL("https://nexus.fuchicorp.com/service/rest/v1/components?repository=webplatform"))
+  nexusData.items.each {
+    if (it.name.contains(branchName)) {
+       versionList.add(it.name + ':' + it.version)
+     }
+    }
   while (true) {
     if (nexusData.continuationToken) {
       token = nexusData.continuationToken

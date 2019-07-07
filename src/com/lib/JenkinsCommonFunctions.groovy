@@ -18,15 +18,6 @@ def scheduleBaseJobs(String baseName, String jobName) {
 }
 
 
-// @Library('CommonLib@master') _
-// def common = new com.lib.JenkinsCommonFunctions()
-// common.scheduleBaseJobs('base', 'master')
-
-
-
-
-
-
 
 
 

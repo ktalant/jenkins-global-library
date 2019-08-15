@@ -18,7 +18,7 @@ def runPipeline() {
 
   def commonDeployer = new com.lib.JenkinsDeployerPipeline()
   def messanger = new com.lib.JenkinsNotificator()
-  def slackChannel = "devops"
+  def slackChannel = "devops-alerts"
   def repositoryName = "${JOB_NAME}"
       .split('/')[0]
       .replace('-fuchicorp', '')

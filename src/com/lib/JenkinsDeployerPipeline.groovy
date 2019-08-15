@@ -10,7 +10,7 @@ def runPipeline() {
   def environment   = ""
   def branch        = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
   def messanger     = new com.lib.JenkinsNotificator()
-  def slackChannel  = "devops"
+  def slackChannel  = "devops-alerts"
   def branchName    = "${scm.branches[0].name}".replaceAll(/^\*\//, '')
   String dateTime   = new SimpleDateFormat("yyyy/MM/dd.HH-mm-ss").format(Calendar.getInstance().getTime())
   def credId        = scm.getUserRemoteConfigs()[0].getCredentialsId()

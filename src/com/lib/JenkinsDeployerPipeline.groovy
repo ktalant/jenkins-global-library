@@ -39,7 +39,7 @@ def runPipeline() {
 
   try {
     properties([ parameters([
-      choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
+      choice(name: 'selectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
       booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraformDestroy'),
       string(defaultValue: 'fuchicorp-google-service-account', name: 'common_service_account', description: 'Please enter service Account ID', trim: true),
@@ -64,7 +64,7 @@ def runPipeline() {
             deployment_namespace      =  "${environment}"
             deployment_environment    =  "${environment}"
             deployment_name           =  "${deploymentName}"
-            deployment_image          =  "docker.fuchicorp.com/${SelectedDockerImage}"
+            deployment_image          =  "docker.fuchicorp.com/${selectedDockerImage}"
             deployment_credentials    =  "./fuchicorp-service-account.json"
             """.stripIndent()
             sh "cat ${deployment_configuration} >> ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars"

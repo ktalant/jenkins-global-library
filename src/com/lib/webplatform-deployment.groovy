@@ -7,19 +7,14 @@ import java.text.SimpleDateFormat
 def runPipeline() {
 
 
-  def environment    = ""
-  def branch         = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
-  def messanger      = new com.lib.JenkinsNotificator()
-  def slackChannel   = "devops-alerts"
-  def branchName     = "${scm.branches[0].name}".replaceAll(/^\*\//, '')
-  String dateTime    = new SimpleDateFormat("yyyy/MM/dd.HH-mm-ss").format(Calendar.getInstance().getTime())
-  def credId         = scm.getUserRemoteConfigs()[0].getCredentialsId()
-  String repoUrl     = scm.getUserRemoteConfigs()[0].getUrl().replace('https://', '')
-  def deploymentName = "${JOB_NAME}"
-                        .split('/')[0]
-                        .replace('-fuchicorp', '')
-                        .replace('-build', '')
-                        .replace('-deploy', '')
+  def environment   = ""
+  def branch        = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
+  def messanger     = new com.lib.JenkinsNotificator()
+  def slackChannel  = "devops-alerts"
+  def branchName    = "${scm.branches[0].name}".replaceAll(/^\*\//, '')
+  String dateTime   = new SimpleDateFormat("yyyy/MM/dd.HH-mm-ss").format(Calendar.getInstance().getTime())
+  def credId        = scm.getUserRemoteConfigs()[0].getCredentialsId()
+  String repoUrl = scm.getUserRemoteConfigs()[0].getUrl().replace('https://', '')
 
   switch(branch) {
     case "master": environment = "prod"
@@ -34,22 +29,25 @@ def runPipeline() {
 
     default:
         currentBuild.result = 'FAILURE'
-        println('This branch does not supported')
+        print('This branch does not supported')
   }
 
   try {
     properties([ parameters([
       choice(name: 'SelectedDockerImage', choices: findDockerImages(branch), description: 'Please select docker image to deploy!'),
+      choice(name: 'ApiSelectedDockerImage', choices: findDockerImages('api'), description: 'Please select docker image for api!'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraformApply'),
       booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraformDestroy'),
-      string(defaultValue: 'fuchicorp-google-service-account', name: 'common_service_account', description: 'Please enter service Account ID', trim: true),
-      string(defaultValue: 'webplatform-configuration', name: 'deployment_configuration', description: 'Please enter configuration name', trim: true)
-      ])])
+      string( defaultValue: 'webplatform', name: 'mysql_database', value: 'dbwebplatform', description: 'Please enter database name'),
+      string(defaultValue: 'webplatformUser',  name: 'mysql_user',description: 'Please enter a username for MySQL', trim: true),
+      string(defaultValue: 'webplatformPassword',  name: 'mysql_password',description: 'Please enter a password for MySQL', trim: true),
+      string(defaultValue: 'fuchicorp-google-service-account', name: 'common_service_account', description: 'Please enter service Account ID', trim: true)
+      ]
+      )])
 
       node('master') {
         withCredentials([
-          file(credentialsId: "${common_service_account}", variable: 'common_user'),
-           file(credentialsId: "${deployment_configuration}", variable: 'common_config')]) {
+          file(credentialsId: "${common_service_account}", variable: 'common_user')]) {
             messanger.sendMessage("slack", "STARED", slackChannel)
             stage('Poll code') {
               checkout scm
@@ -59,15 +57,19 @@ def runPipeline() {
             }
 
           stage('Generate Vars') {
-            def file = new File("${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars")
+            def file = new File("${WORKSPACE}/deployment/terraform/webplatform.tfvars")
             file.write """
-            deployment_namespace      =  "${environment}"
-            deployment_environment    =  "${environment}"
-            deployment_name           =  "${deploymentName}"
-            deployment_image          =  "docker.fuchicorp.com/${SelectedDockerImage}"
-            deployment_credentials    =  "./fuchicorp-service-account.json"
+            mysql_user                =  "${mysql_user}"
+            mysql_database            =  "${mysql_database}"
+            mysql_host                =  "webplatform-mysql"
+            webplatform_namespace     =  "${environment}"
+            webplatform_password      =  "${mysql_password}"
+            webplatform_image         =  "docker.fuchicorp.com/${SelectedDockerImage}"
+            api_platform_image        =  "docker.fuchicorp.com/${ApiSelectedDockerImage}"
+            environment               =  "${environment}"
+            credentials               =  "./fuchicorp-service-account.json"
+            deployment_name           =  "webplatform"
             """.stripIndent()
-            sh "cat ${deployment_configuration} >> ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars"
           }
 
           stage('Terraform Apply/Plan') {
@@ -77,11 +79,11 @@ def runPipeline() {
                 dir("${WORKSPACE}/deployment/terraform") {
                   echo "##### Terraform Applying the Changes ####"
                   sh '''#!/bin/bash -e
-                  source set-env.sh ./deployment_configuration.tfvars
+                  source set-env.sh ./webplatform.tfvars
                   terraform apply --auto-approve -var-file=$DATAFILE'''
                   messanger.sendMessage("slack", "APPLIED", slackChannel)
                 }
-                if (branch == "prod") {
+                if (branch == 'prod') {
                   sh("""
                     git config --global user.email 'jenkins@fuchicorp.com'
                     git config --global user.name  'Jenkins'
@@ -89,22 +91,24 @@ def runPipeline() {
                     """)
                     tagForGit = "deploy_prod_${dateTime}"
                     sh("git clone http://${repoUrl} ${WORKSPACE}/git_tagger")
-                      withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "${credId}", usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
-                        dir("${WORKSPACE}/git_tagger") {
-                          sh("""git tag -a '${tagForGit}' -m 'Jenkins deployment has been deployed successfully. time: ${dateTime}'
-                          git push https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@${repoUrl} --tags""")
-                        }
+                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "${credId}", usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
+                    dir("${WORKSPACE}/git_tagger") {
+                      sh("""git tag -a '${tagForGit}' -m 'Jenkins deployment has been deployed successfully. time: ${dateTime}'
+                      git push https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@${repoUrl} --tags""")
+                    }
                     sh("rm -rf ${WORKSPACE}/git_tagger")
                   }
                 }
+
+
 
               } else {
 
                   dir("${WORKSPACE}/deployment/terraform") {
                     echo "##### Terraform Plan (Check) the Changes #####"
-                    sh "cat ./deployment_configuration.tfvars"
+                    sh "cat ./webplatform.tfvars"
                     sh '''#!/bin/bash -e
-                    source set-env.sh ./deployment_configuration.tfvars
+                    source set-env.sh ./webplatform.tfvars
                     terraform plan -var-file=$DATAFILE'''
                     messanger.sendMessage("slack", "PLANED", slackChannel)
                   }
@@ -112,24 +116,21 @@ def runPipeline() {
               }
             }
           }
-
           stage('Terraform Destroy') {
             if (!params.terraformApply) {
               if (params.terraformDestroy) {
-                if ( branch.toLowerCase() != "prod" ) {
+                if ( branch == 'dev' || branch == 'qa' ) {
                   dir("${WORKSPACE}/deployment/terraform") {
                     echo "##### Terraform Destroing #####"
                     sh '''#!/bin/bash -e
-                    source set-env.sh ./deployment_configuration.tfvars
+                    source set-env.sh ./webplatform.tfvars
                     terraform destroy --auto-approve -var-file=$DATAFILE'''
                     messanger.sendMessage("slack", "DESTROYED", slackChannel)
                   }
                 } else {
                   println("""
-
                     Sorry I can not destroy PROD!!!
                     I can Destroy only dev and qa branch
-
                   """)
                 }
               }

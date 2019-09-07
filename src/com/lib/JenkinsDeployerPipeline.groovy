@@ -49,7 +49,7 @@ def runPipeline() {
       node('master') {
         withCredentials([
           file(credentialsId: "${common_service_account}", variable: 'common_user'),
-           file(credentialsId: "${deployment_configuration}", variable: 'common_config')]) {
+           file(credentialsId: "${deployment_configuration}", variable: 'deployment_config')]) {
             messanger.sendMessage("slack", "STARED", slackChannel)
             stage('Poll code') {
               checkout scm
@@ -67,7 +67,7 @@ def runPipeline() {
             deployment_image          =  "docker.fuchicorp.com/${selectedDockerImage}"
             deployment_credentials    =  "./fuchicorp-service-account.json"
             """.stripIndent()
-            sh "cat ${deployment_configuration} >> ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars"
+            sh "cat ${deployment_config} >> ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars"
           }
 
           stage('Terraform Apply/Plan') {

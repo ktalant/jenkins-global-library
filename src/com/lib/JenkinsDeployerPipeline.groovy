@@ -64,7 +64,7 @@ def runPipeline() {
             deployment_environment    =  "${environment}"
             deployment_name           =  "${deploymentName}"
             deployment_image          =  "docker.fuchicorp.com/${selectedDockerImage}"
-            deployment_credentials    =  "./fuchicorp-service-account.json"
+            credentials               =  "./fuchicorp-service-account.json"
             """.stripIndent()
             sh "cat ${deployment_config} >> ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars"
           }

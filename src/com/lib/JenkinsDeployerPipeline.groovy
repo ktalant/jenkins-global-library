@@ -61,7 +61,6 @@ def runPipeline() {
           stage('Generate Vars') {
             def file = new File("${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars")
             file.write """
-            deployment_namespace      =  "${environment}"
             deployment_environment    =  "${environment}"
             deployment_name           =  "${deploymentName}"
             deployment_image          =  "docker.fuchicorp.com/${selectedDockerImage}"

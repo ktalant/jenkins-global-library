@@ -78,7 +78,6 @@ def runPipeline() {
           hostPath:
             path: /var/run/docker.sock
   """
-  println("JenkinsSlave: ${slavePodTemplate}")
 
   podTemplate(name: k8slabel, label: k8slabel, yaml: slavePodTemplate) {
       node(k8slabel) {

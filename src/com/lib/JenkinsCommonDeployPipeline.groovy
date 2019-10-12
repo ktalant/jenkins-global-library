@@ -5,9 +5,9 @@ import hudson.FilePath
 
 
 def runPipeline() {
-
   def environment = ""
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
+  def k8slabel = "jenkins-pipeline-${UUID.randomUUID().toString()}"
 
   switch(branch) {
     case 'master': environment = 'tools'
@@ -27,75 +27,129 @@ def runPipeline() {
       ]
       )])
 
-      node('master') {
-        withCredentials([
-          file(credentialsId: "${params_tfvars_id}", variable: 'deployment_fvars'),
-          file(credentialsId: "${common_service_account}", variable: 'common_user')]) {
-            stage('Poll code') {
-              checkout scm
-              sh """#!/bin/bash -e
-              cp -rf ${common_user} ${WORKSPACE}/fuchicorp-service-account.json
-              cp -rf ${deployment_fvars} ${WORKSPACE}/fuchicorp-common-tools.tfvars
-              """
+
+
+    def slavePodTemplate = """
+    metadata:
+      labels:
+        k8s-label: ${k8slabel}
+      annotations:
+        jenkinsjoblabel: ${env.JOB_NAME}-${env.BUILD_NUMBER}
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: component
+                operator: In
+                values:
+                - jenkins-jenkins-master
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: docker
+        image: docker:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        command:
+        - cat
+        tty: true
+        volumeMounts:
+          - mountPath: /var/run/docker.sock
+            name: docker-sock
+      - name: fuchicorptools
+        image: fuchicorp/buildtools
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        command:
+        - cat
+        tty: true
+      securityContext:
+        runAsUser: 0
+        fsGroup: 0
+      volumes:
+        - name: docker-sock
+          hostPath:
+            path: /var/run/docker.sock
+  """
+  println("JenkinsSlave: ${slavePodTemplate}")
+
+  podTemplate(name: k8slabel, label: k8slabel, yaml: slavePodTemplate) {
+      node(k8slabel) {
+          withCredentials([
+            file(credentialsId: "${params_tfvars_id}", variable: 'deployment_fvars'),
+            file(credentialsId: "${common_service_account}", variable: 'common_user')]) {
+              stage('Poll code') {
+                checkout scm
+                sh """#!/bin/bash -e
+                cp -rf ${common_user} ${WORKSPACE}/fuchicorp-service-account.json
+                cp -rf ${deployment_fvars} ${WORKSPACE}/fuchicorp-common-tools.tfvars
+                """
+              }
+
+            stage('Terraform Apply/Plan') {
+              if (!params.terraform_destroy) {
+                if (params.terraform_apply) {
+
+                  dir("${WORKSPACE}/") {
+                    echo "##### Terraform Applying the Changes ####"
+                    sh '''#!/bin/bash -e
+                    source set-env.sh ./fuchicorp-common-tools.tfvars
+                    terraform apply --auto-approve -var-file=$DATAFILE'''
+                  }
+
+                } else {
+
+                  dir("${WORKSPACE}/") {
+                    echo "##### Terraform Plan (Check) the Changes #### "
+                    sh '''#!/bin/bash -e
+                    source set-env.sh ./fuchicorp-common-tools.tfvars
+                    terraform plan -var-file=$DATAFILE'''
+                  }
+                }
+              }
             }
+            stage('Terraform Destroy') {
+              if (!params.terraform_apply) {
+                if (params.terraform_destroy) {
+                  if ( environment != 'tools' ) {
+                    dir("${WORKSPACE}/") {
+                      echo "##### Terraform Destroing ####"
+                      sh '''#!/bin/bash -e
+                      source set-env.sh ./fuchicorp-common-tools.tfvars
+                      terraform destroy --auto-approve -var-file=$DATAFILE'''
+                    }
+                  } else {
+                    println("""
 
-          stage('Terraform Apply/Plan') {
-            if (!params.terraform_destroy) {
-              if (params.terraform_apply) {
+                      Sorry I can not destroy Tools!!!
+                      I can Destroy only dev and qa branch
 
-                dir("${WORKSPACE}/") {
-                  echo "##### Terraform Applying the Changes ####"
-                  sh '''#!/bin/bash -e
-                  source set-env.sh ./fuchicorp-common-tools.tfvars
-                  terraform apply --auto-approve -var-file=$DATAFILE'''
+                    """)
+                  }
                 }
+             }
 
-              } else {
+             if (params.terraform_destroy) {
+               if (params.terraform_apply) {
+                 println("""
 
-                dir("${WORKSPACE}/") {
-                  echo "##### Terraform Plan (Check) the Changes #### "
-                  sh '''#!/bin/bash -e
-                  source set-env.sh ./fuchicorp-common-tools.tfvars
-                  terraform plan -var-file=$DATAFILE'''
-                }
+                 Sorry you can not destroy and apply at the same time
+
+                 """)
+                 currentBuild.result = 'FAILURE'
               }
             }
           }
-          stage('Terraform Destroy') {
-            if (!params.terraform_apply) {
-              if (params.terraform_destroy) {
-                if ( environment != 'tools' ) {
-                  dir("${WORKSPACE}/") {
-                    echo "##### Terraform Destroing ####"
-                    sh '''#!/bin/bash -e
-                    source set-env.sh ./fuchicorp-common-tools.tfvars
-                    terraform destroy --auto-approve -var-file=$DATAFILE'''
-                  }
-                } else {
-                  println("""
-
-                    Sorry I can not destroy Tools!!!
-                    I can Destroy only dev and qa branch
-
-                  """)
-                }
-              }
-           }
-
-           if (params.terraform_destroy) {
-             if (params.terraform_apply) {
-               println("""
-
-               Sorry you can not destroy and apply at the same time
-
-               """)
-               currentBuild.result = 'FAILURE'
-            }
-         }
-       }
-     }
-   }
-
+        }
+      }
+    }
   } catch (e) {
     currentBuild.result = 'FAILURE'
     println("ERROR Detected:")

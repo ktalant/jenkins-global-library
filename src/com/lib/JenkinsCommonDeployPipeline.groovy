@@ -22,7 +22,7 @@ def runPipeline() {
     properties([ parameters([
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraform_apply'),
       booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraform_destroy'),
-      text(name: 'deployment_tfvars', defaultValue: 'deployment_name = "tools"', description: 'terraform configuration', trim: true),
+      text(name: 'deployment_tfvars', defaultValue: 'deployment_name = "tools"', description: 'terraform configuration'),
       string(defaultValue: 'fuchicorp-google-service-account', name: 'common_service_account', description: 'Please enter service Account ID', trim: true)
       ]
       )])

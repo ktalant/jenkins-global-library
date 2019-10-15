@@ -85,6 +85,11 @@ def runPipeline() {
   podTemplate(name: k8slabel, label: k8slabel, yaml: slavePodTemplate) {
       node(k8slabel) {
         container('fuchicorptools') {
+          
+          stage("Polling SCM") {
+            checkout scm
+          }
+
           stage('Generate Configurations') {
             // sh "sleep 200"
             sh """
@@ -96,11 +101,6 @@ def runPipeline() {
             cat ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars
             """
           }
-
-          stage("Polling SCM") {
-            checkout scm
-          }
-
           stage('Terraform Apply/Plan') {
             if (!params.terraform_destroy) {
               if (params.terraform_apply) {

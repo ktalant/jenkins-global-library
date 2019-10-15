@@ -75,8 +75,6 @@ def runPipeline() {
         - name: fuchicorptools
           image: fuchicorp/buildtools
           imagePullPolicy: Always
-          command:
-          - cat
           tty: true
           volumeMounts:
             - mountPath: /var/run/docker.sock
@@ -110,11 +108,13 @@ def runPipeline() {
             mkdir -p ${WORKSPACE}/deployment/terraform/
             cat  /etc/secrets/service-account/credentials.json > ${WORKSPACE}/deployment/terraform/fuchicorp-service-account.json
             ls ${WORKSPACE}/deployment/terraform/
+            sh /scripts/Dockerfile/set-config.sh
             """
             deployment_tfvars += """
             deployment_name        = \"${deploymentName}\"
             deployment_environment = \"${environment}\"
             """
+
             writeFile(
               [file: "${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars", text: "${deployment_tfvars}"]
               )

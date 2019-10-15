@@ -22,7 +22,7 @@ def runPipeline() {
     properties([ parameters([
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraform_apply'),
       booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraform_destroy'),
-      text(name: 'common-tools-tfvars', defaultValue: 'deployment_name = "tools"', description: 'terraform configuration', trim: true),
+      text(name: 'deployment_tfvars', defaultValue: 'deployment_name = "tools"', description: 'terraform configuration', trim: true),
       string(defaultValue: 'fuchicorp-google-service-account', name: 'common_service_account', description: 'Please enter service Account ID', trim: true)
       ]
       )])
@@ -81,7 +81,7 @@ def runPipeline() {
           stage('Generate Configurations') {
             sh "cp /etc/secrets/service-account/credentials.json /deployment/terraform/fuchicorp-service-account.json"
             def file = new File("${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars")
-            file.write "${common-tools-tfvars}".stripIndent()
+            file.write "${deployment_tfvars}".stripIndent()
           }
 
           stage('Terraform Apply/Plan') {

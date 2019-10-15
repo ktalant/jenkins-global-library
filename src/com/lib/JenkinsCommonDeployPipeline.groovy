@@ -117,7 +117,7 @@ def runPipeline() {
                 dir("${WORKSPACE}/deployment/terraform/") {
                   echo "##### Terraform Plan (Check) the Changes #### "
                   sh '''#!/bin/bash -e
-                  source set-env.sh ./deployment_configuration.tfvars
+                  source set-env.sh deployment_configuration.tfvars
                   terraform plan -var-file=$DATAFILE'''
                 }
               }
@@ -130,7 +130,7 @@ def runPipeline() {
                   dir("${WORKSPACE}/deployment/terraform/") {
                     echo "##### Terraform Destroing ####"
                     sh '''#!/bin/bash -e
-                    source set-env.sh ./deployment_configuration.tfvars
+                    source set-env.sh deployment_configuration.tfvars
                     terraform destroy --auto-approve -var-file=$DATAFILE'''
                   }
                 } else {

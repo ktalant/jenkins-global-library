@@ -108,6 +108,7 @@ def runPipeline() {
             sh """
             mkdir -p ${WORKSPACE}/deployment/terraform/
             cat  /etc/secrets/service-account/credentials.json > ${WORKSPACE}/deployment/terraform/fuchicorp-service-account.json
+            ls ${WORKSPACE}/deployment/terraform/
             """
             def file = new File("${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars")
             file.write "${deployment_tfvars}"

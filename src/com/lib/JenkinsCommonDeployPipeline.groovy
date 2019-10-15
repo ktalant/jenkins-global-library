@@ -9,14 +9,15 @@ def runPipeline() {
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
   def k8slabel = "jenkins-pipeline-${UUID.randomUUID().toString()}"
 
-  switch(branch) {
-    case 'master': environment = 'tools'
-    break
-
-    default:
-        currentBuild.result = 'FAILURE'
-        print('This branch does not supported')
-  }
+  environment = 'tools'
+  // switch(branch) {
+  //   case 'master': environment = 'tools'
+  //   break
+  //
+  //   default:
+  //       currentBuild.result = 'FAILURE'
+  //       print('This branch does not supported')
+  // }
 
   try {
     properties([ parameters([

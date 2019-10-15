@@ -116,7 +116,7 @@ def runPipeline() {
             deployment_tfvars += """
             deployment_name        = \"${deploymentName}\"
             deployment_environment = \"${environment}\"
-            deployment_image       = \"${selectedDockerImage}\"
+            deployment_image       = \"docker.fuchicorp.com/${selectedDockerImage}\"
             """
 
             writeFile(

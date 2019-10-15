@@ -69,9 +69,9 @@ def runPipeline() {
           runAsUser: 0
           fsGroup: 0
         volumes:
-        - name: google-service-account
-          secret:
-            secretName: fuchicorp-service-account
+          - name: google-service-account
+            secret:
+              secretName: fuchicorp-service-account
           - name: docker-sock
             hostPath:
               path: /var/run/docker.sock

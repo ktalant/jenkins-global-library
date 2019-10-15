@@ -65,6 +65,11 @@ def runPipeline() {
           command:
           - cat
           tty: true
+          volumeMounts:
+            - mountPath: /var/run/docker.sock
+              name: docker-sock
+            - mountPath: /etc/secrets/service-account/
+              name: google-service-account
         securityContext:
           runAsUser: 0
           fsGroup: 0

@@ -75,6 +75,8 @@ def runPipeline() {
         - name: fuchicorptools
           image: fuchicorp/buildtools
           imagePullPolicy: Always
+          command:
+          - cat
           tty: true
           volumeMounts:
             - mountPath: /var/run/docker.sock

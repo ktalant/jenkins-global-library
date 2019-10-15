@@ -84,12 +84,16 @@ def runPipeline() {
 
   podTemplate(name: k8slabel, label: k8slabel, yaml: slavePodTemplate) {
       node(k8slabel) {
+        container('fuchicorptools') {
           stage('Generate Configurations') {
             // sh "sleep 200"
-            sh " mkdir /deployment/terraform/ -p  && cat  /etc/secrets/service-account/credentials.json > ${WORKSPACE}/deployment/terraform/fuchicorp-service-account.json"
+            sh """
+            mkdir -p ${WORKSPACE}/deployment/terraform/
+            cat  /etc/secrets/service-account/credentials.json > ${WORKSPACE}/deployment/terraform/fuchicorp-service-account.json"""
             def file = new File("${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars")
             file.write "${deployment_tfvars}".stripIndent()
           }
+        }
 
           stage('Terraform Apply/Plan') {
             if (!params.terraform_destroy) {

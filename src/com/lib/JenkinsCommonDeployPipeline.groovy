@@ -96,7 +96,7 @@ def runPipeline() {
             cat ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars
             """
           }
-        }
+
           stage("Polling SCM") {
             checkout scm
           }
@@ -123,6 +123,7 @@ def runPipeline() {
               }
             }
           }
+          
           stage('Terraform Destroy') {
             if (!params.terraform_apply) {
               if (params.terraform_destroy) {
@@ -155,6 +156,7 @@ def runPipeline() {
             }
           }
         }
+       }
       }
     }
   } catch (e) {

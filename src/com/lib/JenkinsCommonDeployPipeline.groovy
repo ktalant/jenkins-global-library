@@ -97,7 +97,10 @@ def runPipeline() {
             """
           }
         }
-
+          stage("Polling SCM") {
+            checkout scm
+          }
+          
           stage('Terraform Apply/Plan') {
             if (!params.terraform_destroy) {
               if (params.terraform_apply) {

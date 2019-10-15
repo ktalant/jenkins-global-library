@@ -51,9 +51,9 @@ def runPipeline() {
       - name: docker
         image: docker:latest
         imagePullPolicy: Always
+        tty: true
         command:
         - cat
-        tty: true
         volumeMounts:
           - mountPath: /etc/secrets/service-account/
             name: google-service-account
@@ -62,9 +62,9 @@ def runPipeline() {
       - name: fuchicorptools
         image: fuchicorp/buildtools
         imagePullPolicy: Always
+        tty: true
         command:
         - cat
-        tty: true
       securityContext:
         runAsUser: 0
         fsGroup: 0

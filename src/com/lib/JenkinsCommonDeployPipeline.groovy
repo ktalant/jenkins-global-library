@@ -8,16 +8,29 @@ def runPipeline() {
   def environment = ""
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
   def k8slabel = "jenkins-pipeline-${UUID.randomUUID().toString()}"
+  def deploymentName = "${JOB_NAME}"
+                        .split('/')[0]
+                        .replace('-fuchicorp', '')
+                        .replace('-build', '')
+                        .replace('-deploy', '')
 
-  environment = 'tools'
-  // switch(branch) {
-  //   case 'master': environment = 'tools'
-  //   break
-  //
-  //   default:
-  //       currentBuild.result = 'FAILURE'
-  //       print('This branch does not supported')
-  // }
+  switch(branch) {
+    case 'master': environment = 'prod'
+    break
+
+    case 'qa': environment = 'qa'
+    break
+
+    case 'dev': environment = 'dev'
+    break
+
+    case 'tools': environment = 'tools'
+    break
+
+    default:
+        currentBuild.result = 'FAILURE'
+        print('This branch does not supported')
+  }
 
   try {
     properties([ parameters([
@@ -85,7 +98,7 @@ def runPipeline() {
   podTemplate(name: k8slabel, label: k8slabel, yaml: slavePodTemplate) {
       node(k8slabel) {
         container('fuchicorptools') {
-          
+
           stage("Polling SCM") {
             checkout scm
           }
@@ -98,6 +111,9 @@ def runPipeline() {
             ls ${WORKSPACE}/deployment/terraform/fuchicorp-service-account.json
             ls ${WORKSPACE}/deployment/terraform/
             echo ${deployment_tfvars} > ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars
+            echo 'deployment_name = "${deploymentName}"' >> ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars
+            echo 'deployment_environment = "${environment}"' >> ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars
+            echo 'credentials = "./fuchicorp-service-account.json"' >> ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars
             cat ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars
             """
           }

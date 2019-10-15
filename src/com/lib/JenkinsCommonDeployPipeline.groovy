@@ -108,14 +108,9 @@ def runPipeline() {
             sh """
             mkdir -p ${WORKSPACE}/deployment/terraform/
             cat  /etc/secrets/service-account/credentials.json > ${WORKSPACE}/deployment/terraform/fuchicorp-service-account.json
-            echo ${deployment_tfvars} > ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars
-            cat <<END > ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars
-            deployment_name = "${deploymentName}"
-            deployment_environment = "${environment}"
-            credentials = "./fuchicorp-service-account.json"
-            END
-            cat ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars
             """
+            def file = new File("${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars")
+            file.write "${deployment_tfvars}"
           }
           stage('Terraform Apply/Plan') {
             if (!params.terraform_destroy) {
@@ -134,7 +129,6 @@ def runPipeline() {
                   echo "##### Terraform Plan (Check) the Changes #### "
                   sh '''#!/bin/bash -e
                   source set-env.sh deployment_configuration.tfvars
-                  pwd
                   terraform plan -var-file=deployment_configuration.tfvars
                   '''
                 }

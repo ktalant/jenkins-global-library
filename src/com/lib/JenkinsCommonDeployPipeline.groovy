@@ -22,7 +22,7 @@ def runPipeline() {
     properties([ parameters([
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraform_apply'),
       booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraform_destroy'),
-      string(defaultValue: 'common-tools-tfvars',  name: 'params_tfvars_id', description: 'Please give tfvars secret ID', trim: true),
+      text(name: 'common-tools-tfvars', defaultValue: 'deployment_name = "tools"', description: 'terraform configuration', trim: true),
       string(defaultValue: 'fuchicorp-google-service-account', name: 'common_service_account', description: 'Please enter service Account ID', trim: true)
       ]
       )])
@@ -58,6 +58,8 @@ def runPipeline() {
         - cat
         tty: true
         volumeMounts:
+          - mountPath: /etc/secrets/service-account/
+            name: google-service-account
           - mountPath: /var/run/docker.sock
             name: docker-sock
       - name: fuchicorptools
@@ -74,6 +76,9 @@ def runPipeline() {
         runAsUser: 0
         fsGroup: 0
       volumes:
+      - name: google-service-account
+        secret:
+          secretName: fuchicorp-service-account
         - name: docker-sock
           hostPath:
             path: /var/run/docker.sock
@@ -81,69 +86,63 @@ def runPipeline() {
 
   podTemplate(name: k8slabel, label: k8slabel, yaml: slavePodTemplate) {
       node(k8slabel) {
-          withCredentials([
-            file(credentialsId: "${params_tfvars_id}", variable: 'deployment_fvars'),
-            file(credentialsId: "${common_service_account}", variable: 'common_user')]) {
-              stage('Poll code') {
-                checkout scm
-                sh """#!/bin/bash -e
-                cp -rf ${common_user} ${WORKSPACE}/fuchicorp-service-account.json
-                cp -rf ${deployment_fvars} ${WORKSPACE}/fuchicorp-common-tools.tfvars
-                """
-              }
+          stage('Generate Configurations') {
+            sh "cp /etc/secrets/service-account/credentials.json /deployment/terraform/fuchicorp-service-account.json"
+            def file = new File("${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars")
+            file.write "${common-tools-tfvars}".stripIndent()
+          }
 
-            stage('Terraform Apply/Plan') {
-              if (!params.terraform_destroy) {
-                if (params.terraform_apply) {
+          stage('Terraform Apply/Plan') {
+            if (!params.terraform_destroy) {
+              if (params.terraform_apply) {
 
-                  dir("${WORKSPACE}/") {
-                    echo "##### Terraform Applying the Changes ####"
-                    sh '''#!/bin/bash -e
-                    source set-env.sh ./fuchicorp-common-tools.tfvars
-                    terraform apply --auto-approve -var-file=$DATAFILE'''
-                  }
+                dir("${WORKSPACE}/deployment/terraform/") {
+                  echo "##### Terraform Applying the Changes ####"
+                  sh '''#!/bin/bash -e
+                  source set-env.sh ./fuchicorp-common-tools.tfvars
+                  terraform apply --auto-approve -var-file=$DATAFILE'''
+                }
 
-                } else {
+              } else {
 
-                  dir("${WORKSPACE}/") {
-                    echo "##### Terraform Plan (Check) the Changes #### "
-                    sh '''#!/bin/bash -e
-                    source set-env.sh ./fuchicorp-common-tools.tfvars
-                    terraform plan -var-file=$DATAFILE'''
-                  }
+                dir("${WORKSPACE}/deployment/terraform/") {
+                  echo "##### Terraform Plan (Check) the Changes #### "
+                  sh '''#!/bin/bash -e
+                  source set-env.sh ./fuchicorp-common-tools.tfvars
+                  terraform plan -var-file=$DATAFILE'''
                 }
               }
             }
-            stage('Terraform Destroy') {
-              if (!params.terraform_apply) {
-                if (params.terraform_destroy) {
-                  if ( environment != 'tools' ) {
-                    dir("${WORKSPACE}/") {
-                      echo "##### Terraform Destroing ####"
-                      sh '''#!/bin/bash -e
-                      source set-env.sh ./fuchicorp-common-tools.tfvars
-                      terraform destroy --auto-approve -var-file=$DATAFILE'''
-                    }
-                  } else {
-                    println("""
-
-                      Sorry I can not destroy Tools!!!
-                      I can Destroy only dev and qa branch
-
-                    """)
+          }
+          stage('Terraform Destroy') {
+            if (!params.terraform_apply) {
+              if (params.terraform_destroy) {
+                if ( environment != 'tools' ) {
+                  dir("${WORKSPACE}/deployment/terraform/") {
+                    echo "##### Terraform Destroing ####"
+                    sh '''#!/bin/bash -e
+                    source set-env.sh ./fuchicorp-common-tools.tfvars
+                    terraform destroy --auto-approve -var-file=$DATAFILE'''
                   }
+                } else {
+                  println("""
+
+                    Sorry I can not destroy Tools!!!
+                    I can Destroy only dev and qa branch
+
+                  """)
                 }
-             }
-
-             if (params.terraform_destroy) {
-               if (params.terraform_apply) {
-                 println("""
-
-                 Sorry you can not destroy and apply at the same time
-
-                 """)
-                 currentBuild.result = 'FAILURE'
               }
+           }
+
+           if (params.terraform_destroy) {
+             if (params.terraform_apply) {
+               println("""
+
+               Sorry you can not destroy and apply at the same time
+
+               """)
+               currentBuild.result = 'FAILURE'
             }
           }
         }

@@ -83,6 +83,7 @@ def runPipeline() {
               name: docker-sock
             - mountPath: /etc/secrets/service-account/
               name: google-service-account
+        serviceAccountName: common-service-account
         securityContext:
           runAsUser: 0
           fsGroup: 0

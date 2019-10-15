@@ -110,8 +110,7 @@ def runPipeline() {
             cat  /etc/secrets/service-account/credentials.json > ${WORKSPACE}/deployment/terraform/fuchicorp-service-account.json
             ls ${WORKSPACE}/deployment/terraform/
             """
-            def file = new File("${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars")
-            file.write "${deployment_tfvars}"
+            writeFile([file: "${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars", text: "${deployment_tfvars}"])
           }
           stage('Terraform Apply/Plan') {
             if (!params.terraform_destroy) {

@@ -5,6 +5,7 @@ import hudson.FilePath
 
 
 def runPipeline() {
+  def common_docker = new JenkinsDeployerPipeline()
   def environment = ""
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
   def k8slabel = "jenkins-pipeline-${UUID.randomUUID().toString()}"
@@ -34,14 +35,13 @@ def runPipeline() {
 
   try {
     properties([ parameters([
+
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraform_apply'),
       booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraform_destroy'),
-      text(name: 'deployment_tfvars', defaultValue: 'deployment_name = "tools"', description: 'terraform configuration'),
-      string(defaultValue: 'fuchicorp-google-service-account', name: 'common_service_account', description: 'Please enter service Account ID', trim: true)
+      choice(name: 'selectedDockerImage', choices: common_docker.findDockerImages(deploymentName), description: 'Please select docker image to deploy!'),
+      text(name: 'deployment_tfvars', defaultValue: 'deployment_name = "tools"', description: 'terraform configuration')
       ]
       )])
-
-
 
       def slavePodTemplate = """
       metadata:
@@ -110,11 +110,13 @@ def runPipeline() {
             mkdir -p ${WORKSPACE}/deployment/terraform/
             cat  /etc/secrets/service-account/credentials.json > ${WORKSPACE}/deployment/terraform/fuchicorp-service-account.json
             ls ${WORKSPACE}/deployment/terraform/
+            ## This script should move to docker container to set up ~/.kube/config
             sh /scripts/Dockerfile/set-config.sh
             """
             deployment_tfvars += """
             deployment_name        = \"${deploymentName}\"
             deployment_environment = \"${environment}\"
+            deployment_image       = \"${selectedDockerImage}\"
             """
 
             writeFile(

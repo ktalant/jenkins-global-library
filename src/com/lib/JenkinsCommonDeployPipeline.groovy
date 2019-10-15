@@ -134,7 +134,9 @@ def runPipeline() {
                   echo "##### Terraform Plan (Check) the Changes #### "
                   sh '''#!/bin/bash -e
                   source set-env.sh deployment_configuration.tfvars
-                  terraform plan -var-file=deployment_configuration.tfvars'''
+                  pwd 
+                  terraform plan -var-file=deployment_configuration.tfvars
+                  '''
                 }
               }
             }

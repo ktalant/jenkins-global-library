@@ -85,8 +85,8 @@ def runPipeline() {
   podTemplate(name: k8slabel, label: k8slabel, yaml: slavePodTemplate) {
       node(k8slabel) {
           stage('Generate Configurations') {
-            sh "sleep 200"
-            sh "cp /etc/secrets/service-account/credentials.json /deployment/terraform/fuchicorp-service-account.json"
+            // sh "sleep 200"
+            sh "cat  /etc/secrets/service-account/credentials.json > ${WORKSPACE}/deployment/terraform/fuchicorp-service-account.json"
             def file = new File("${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars")
             file.write "${deployment_tfvars}".stripIndent()
           }

@@ -110,7 +110,7 @@ def runPipeline() {
             cat  /etc/secrets/service-account/credentials.json > ${WORKSPACE}/deployment/terraform/fuchicorp-service-account.json
             ls ${WORKSPACE}/deployment/terraform/
             """
-            deployment_tfvars =+ """
+            deployment_tfvars += """
             deployment_name        = \"${deploymentName}\"
             deployment_environment = \"${environment}\"
             """

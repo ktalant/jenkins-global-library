@@ -50,10 +50,6 @@ def runPipeline() {
       - name: docker
         image: docker:latest
         imagePullPolicy: Always
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
         command:
         - cat
         tty: true
@@ -65,10 +61,6 @@ def runPipeline() {
       - name: fuchicorptools
         image: fuchicorp/buildtools
         imagePullPolicy: Always
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
         command:
         - cat
         tty: true

@@ -125,7 +125,7 @@ def runPipeline() {
                   echo "##### Terraform Applying the Changes ####"
                   sh '''#!/bin/bash -e
                   source set-env.sh deployment_configuration.tfvars
-                  terraform apply --auto-approve -var-file=$DATAFILE'''
+                  terraform apply --auto-approve -var-file=deployment_configuration.tfvars'''
                 }
 
               } else {
@@ -134,8 +134,7 @@ def runPipeline() {
                   echo "##### Terraform Plan (Check) the Changes #### "
                   sh '''#!/bin/bash -e
                   source set-env.sh deployment_configuration.tfvars
-                  echo $DATAFILE
-                  terraform plan -var-file=$DATAFILE'''
+                  terraform plan -var-file=deployment_configuration.tfvars'''
                 }
               }
             }
@@ -149,7 +148,7 @@ def runPipeline() {
                     echo "##### Terraform Destroing ####"
                     sh '''#!/bin/bash -e
                     source set-env.sh deployment_configuration.tfvars
-                    terraform destroy --auto-approve -var-file=$DATAFILE'''
+                    terraform destroy --auto-approve -var-file=deployment_configuration.tfvars'''
                   }
                 } else {
                   println("""

@@ -88,10 +88,8 @@ def runPipeline() {
           stage('Generate Configurations') {
             // sh "sleep 200"
             sh """
-            whoami
             mkdir -p ${WORKSPACE}/deployment/terraform/
-            cat  /etc/secrets/service-account/credentials.json
-            """
+            cat  /etc/secrets/service-account/credentials.json > ${WORKSPACE}/deployment/terraform/fuchicorp-service-account.json"""
             def file = new File("${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars")
             file.write "${deployment_tfvars}".stripIndent()
           }

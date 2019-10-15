@@ -57,6 +57,8 @@ def runPipeline() {
           volumeMounts:
             - mountPath: /var/run/docker.sock
               name: docker-sock
+            - mountPath: /etc/secrets/service-account/
+              name: google-service-account
         - name: fuchicorptools
           image: fuchicorp/buildtools
           imagePullPolicy: Always
@@ -67,6 +69,9 @@ def runPipeline() {
           runAsUser: 0
           fsGroup: 0
         volumes:
+        - name: google-service-account
+          secret:
+            secretName: fuchicorp-service-account
           - name: docker-sock
             hostPath:
               path: /var/run/docker.sock

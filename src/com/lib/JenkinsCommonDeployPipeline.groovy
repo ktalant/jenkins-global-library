@@ -25,8 +25,8 @@ def runPipeline() {
     case 'dev': environment = 'dev'
     break
 
-    // case 'tools': environment = 'tools'
-    // break
+    case 'tools': environment = 'tools'
+    break
 
     default:
         currentBuild.result = 'FAILURE'
@@ -42,7 +42,7 @@ def runPipeline() {
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraform_apply'),
       booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraform_destroy'),
       choice(name: 'selectedDockerImage', choices: common_docker.findDockerImages(deploymentName), description: 'Please select docker image to deploy!'),
-      text(name: 'deployment_tfvars', defaultValue: 'deployment_name = "tools"', description: 'terraform configuration')
+      text(name: 'deployment_tfvars', defaultValue: 'extra_values = "tools"', description: 'terraform configuration')
       ]
       )])
 

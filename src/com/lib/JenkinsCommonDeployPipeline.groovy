@@ -117,6 +117,7 @@ def runPipeline() {
             deployment_name        = \"${deploymentName}\"
             deployment_environment = \"${environment}\"
             deployment_image       = \"docker.fuchicorp.com/${selectedDockerImage}\"
+            credentials            = \"./fuchicorp-service-account.json\"
             """.stripIndent()
 
 

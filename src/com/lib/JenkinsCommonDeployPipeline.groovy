@@ -33,6 +33,9 @@ def runPipeline() {
         print('This branch does not supported')
   }
 
+  println("Branch: ${branch}")
+  println("Environment: ${environment}")
+  
   try {
     properties([ parameters([
 

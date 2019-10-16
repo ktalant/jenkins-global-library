@@ -120,11 +120,11 @@ def runPipeline() {
             credentials            = \"./fuchicorp-service-account.json\"
             """.stripIndent()
 
-
-
             writeFile(
               [file: "${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars", text: "${deployment_tfvars}"]
               )
+
+              sh "cat ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars"
           }
           stage('Terraform Apply/Plan') {
             if (!params.terraform_destroy) {

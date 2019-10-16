@@ -41,7 +41,7 @@ def runPipeline() {
 
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraform_apply'),
       booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraform_destroy'),
-      choice(name: 'selectedDockerImage', choices: common_docker.findDockerImages(deploymentName), description: 'Please select docker image to deploy!'),
+      choice(name: 'selectedDockerImage', choices: common_docker.findDockerImages(deploymentName + '-' + environment), description: 'Please select docker image to deploy!'),
       text(name: 'deployment_tfvars', defaultValue: 'extra_values = "tools"', description: 'terraform configuration')
       ]
       )])

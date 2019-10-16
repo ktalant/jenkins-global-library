@@ -9,11 +9,11 @@ def runPipeline() {
   def environment = ""
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
   def k8slabel = "jenkins-pipeline-${UUID.randomUUID().toString()}"
-  def deploymentName = "${JOB_NAME}"
-                        .split('/')[0]
-                        .replace('-fuchicorp', '')
-                        .replace('-build', '')
-                        .replace('-deploy', '')
+  def repositoryName = "${JOB_NAME}"
+      .split('/')[0]
+      .replace('-fuchicorp', '')
+      .replace('-build', '')
+      .replace('-deploy', '')
 
   switch(branch) {
     case 'master': environment = 'prod'

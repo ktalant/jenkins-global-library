@@ -97,6 +97,9 @@ def runPipeline() {
   podTemplate(name: k8slabel, label: k8slabel, yaml: slavePodTemplate) {
       node(k8slabel) {
         container('fuchicorptools') {
+          stage("Pulling the code") {
+            checkout scm
+          }
           stage('Build docker image') {
 
               // Build the docker image

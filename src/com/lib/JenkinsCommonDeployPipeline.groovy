@@ -119,9 +119,13 @@ def runPipeline() {
             deployment_image       = \"docker.fuchicorp.com/${selectedDockerImage}\"
             """
 
+
+
             writeFile(
               [file: "${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars", text: "${deployment_tfvars}"]
               )
+
+              sh "cat ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars"
           }
           stage('Terraform Apply/Plan') {
             if (!params.terraform_destroy) {

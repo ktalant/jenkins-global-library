@@ -125,8 +125,6 @@ def runPipeline() {
             writeFile(
               [file: "${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars", text: "${deployment_tfvars}"]
               )
-
-              sh "cat ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars"
           }
           stage('Terraform Apply/Plan') {
             if (!params.terraform_destroy) {
@@ -145,7 +143,6 @@ def runPipeline() {
                   echo "##### Terraform Plan (Check) the Changes #### "
                   sh '''#!/bin/bash -e
                   source set-env.sh deployment_configuration.tfvars
-                  cat backend.tf
                   terraform plan -var-file=deployment_configuration.tfvars
                   '''
                 }

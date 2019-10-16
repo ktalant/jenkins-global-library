@@ -25,8 +25,8 @@ def runPipeline() {
     case 'dev': environment = 'dev'
     break
 
-    case 'tools': environment = 'tools'
-    break
+    // case 'tools': environment = 'tools'
+    // break
 
     default:
         currentBuild.result = 'FAILURE'
@@ -35,7 +35,7 @@ def runPipeline() {
 
   println("Branch: ${branch}")
   println("Environment: ${environment}")
-  
+
   try {
     properties([ parameters([
 

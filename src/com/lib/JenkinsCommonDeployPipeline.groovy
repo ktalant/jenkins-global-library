@@ -110,9 +110,9 @@ def runPipeline() {
           stage('Generate Configurations') {
             // sh "sleep 200"
             sh """
-            mkdir -p ${WORKSPACE}/deployment/terraform/
-            cat  /etc/secrets/service-account/credentials.json > ${WORKSPACE}/deployment/terraform/fuchicorp-service-account.json
-            ls ${WORKSPACE}/deployment/terraform/
+            mkdir -p ${WORKSPACE}/deployments/terraform/
+            cat  /etc/secrets/service-account/credentials.json > ${WORKSPACE}/deployments/terraform/fuchicorp-service-account.json
+            ls ${WORKSPACE}/deployments/terraform/
             ## This script should move to docker container to set up ~/.kube/config
             sh /scripts/Dockerfile/set-config.sh
             """
@@ -124,16 +124,16 @@ def runPipeline() {
             """.stripIndent()
 
             writeFile(
-              [file: "${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars", text: "${deployment_tfvars}"]
+              [file: "${WORKSPACE}/deployments/terraform/deployment_configuration.tfvars", text: "${deployment_tfvars}"]
               )
 
-              sh "cat ${WORKSPACE}/deployment/terraform/deployment_configuration.tfvars"
+              sh "cat ${WORKSPACE}/deployments/terraform/deployment_configuration.tfvars"
           }
           stage('Terraform Apply/Plan') {
             if (!params.terraform_destroy) {
               if (params.terraform_apply) {
 
-                dir("${WORKSPACE}/deployment/terraform/") {
+                dir("${WORKSPACE}/deployments/terraform/") {
                   echo "##### Terraform Applying the Changes ####"
                   sh '''#!/bin/bash -e
                   source set-env.sh deployment_configuration.tfvars
@@ -142,7 +142,7 @@ def runPipeline() {
 
               } else {
 
-                dir("${WORKSPACE}/deployment/terraform/") {
+                dir("${WORKSPACE}/deployments/terraform/") {
                   echo "##### Terraform Plan (Check) the Changes #### "
                   sh '''#!/bin/bash -e
                   source set-env.sh deployment_configuration.tfvars
@@ -157,7 +157,7 @@ def runPipeline() {
             if (!params.terraform_apply) {
               if (params.terraform_destroy) {
                 if ( environment != 'tools' ) {
-                  dir("${WORKSPACE}/deployment/terraform/") {
+                  dir("${WORKSPACE}/deployments/terraform/") {
                     echo "##### Terraform Destroing ####"
                     sh '''#!/bin/bash -e
                     source set-env.sh deployment_configuration.tfvars

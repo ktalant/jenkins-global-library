@@ -101,7 +101,7 @@ def runPipeline() {
             checkout scm
           }
           stage('Build docker image') {
-            dir("${WORKSPACE}/deployment/docker") {
+            dir("${WORKSPACE}/deployments/docker") {
               // Build the docker image
               dockerImage = docker.build(repositoryName + '-' + environment, "--build-arg branch_name=${branch} .")
             }

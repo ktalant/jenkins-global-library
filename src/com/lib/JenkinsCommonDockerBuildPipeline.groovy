@@ -101,9 +101,10 @@ def runPipeline() {
             checkout scm
           }
           stage('Build docker image') {
-
+            dir("${WORKSPACE}/deployment/docker") {
               // Build the docker image
               dockerImage = docker.build(repositoryName + '-' + environment, "--build-arg branch_name=${branch} .")
+            }
           }
 
           stage('Push image') {
@@ -112,7 +113,6 @@ def runPipeline() {
               docker.withRegistry('https://docker.fuchicorp.com', 'nexus-docker-creds') {
                   dockerImage.push("0.${BUILD_NUMBER}")
                   // messanger.sendMessage("slack", "SUCCESS", slackChannel)
-
 
                   if (params.PUSH_LATEST) {
                     dockerImage.push("latest")

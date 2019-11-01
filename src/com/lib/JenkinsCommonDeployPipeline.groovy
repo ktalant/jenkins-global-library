@@ -38,7 +38,7 @@ def runPipeline() {
 
   try {
     properties([ parameters([
-
+      // This hard coded params should be configured inside code
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraform_apply'),
       booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraform_destroy'),
       choice(name: 'selectedDockerImage', choices: common_docker.findDockerImages(deploymentName + '-' + environment), description: 'Please select docker image to deploy!'),
@@ -46,6 +46,7 @@ def runPipeline() {
       ]
       )])
 
+      // Pod slave for Jenkins so Jenkins master can run the job on slaves
       def slavePodTemplate = """
       metadata:
         labels:
@@ -116,6 +117,7 @@ def runPipeline() {
             ## This script should move to docker container to set up ~/.kube/config
             sh /scripts/Dockerfile/set-config.sh
             """
+            // sh /scripts/Dockerfile/set-config.sh Should go to Docker container CMD so we do not have to call on slave 
             deployment_tfvars += """
             deployment_name        = \"${deploymentName}\"
             deployment_environment = \"${environment}\"

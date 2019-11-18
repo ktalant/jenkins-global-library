@@ -101,18 +101,24 @@ def runPipeline() {
             checkout scm
           }
           stage('Build docker image') {
-
+            dir("${WORKSPACE}/deployments/docker") {
               // Build the docker image
               dockerImage = docker.build(repositoryName + '-' + environment, "--build-arg branch_name=${branch} .")
+            }
           }
 
           stage('Push image') {
+
+
+            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "nexus-docker-creds", usernameVariable: 'docker_username', passwordVariable: 'docker_password']]) {
+              sh "docker login --username ${env.docker_username} --password ${env.docker_password} https://docker.fuchicorp.com"
+            }
+
 
              // Push image to the Nexus with new release
               docker.withRegistry('https://docker.fuchicorp.com', 'nexus-docker-creds') {
                   dockerImage.push("0.${BUILD_NUMBER}")
                   // messanger.sendMessage("slack", "SUCCESS", slackChannel)
-
 
                   if (params.PUSH_LATEST) {
                     dockerImage.push("latest")

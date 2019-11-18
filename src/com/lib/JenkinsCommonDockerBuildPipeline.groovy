@@ -109,8 +109,7 @@ def runPipeline() {
 
           stage('Push image') {
 
-            sh """
-            #!/bin/bash
+            sh '''#!/bin/bash -e
             try_num=0
             until ping -c1 docker.fuchicorp.com >/dev/null 2>&1;
             do
@@ -120,8 +119,8 @@ def runPipeline() {
                 echo "Timeout trying to reach docker.fuchicorp.com"
                 exit 1
               fi
-            done
-            """
+            done'''
+
 
              // Push image to the Nexus with new release
               docker.withRegistry('https://docker.fuchicorp.com', 'nexus-docker-creds') {

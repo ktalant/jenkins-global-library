@@ -124,7 +124,7 @@ def runPipeline() {
 
 
              // Push image to the Nexus with new release
-              docker.withRegistry('https://docker.fuchicorp.com', 'nexus-docker-creds') {
+              docker.withRegistry('docker.fuchicorp.com', 'nexus-docker-creds') {
                   dockerImage.push("0.${BUILD_NUMBER}")
                   // messanger.sendMessage("slack", "SUCCESS", slackChannel)
 

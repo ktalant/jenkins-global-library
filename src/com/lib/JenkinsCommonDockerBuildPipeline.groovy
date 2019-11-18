@@ -122,9 +122,10 @@ def runPipeline() {
               fi
             done'''
 
-            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "nexus-docker-creds", usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-              sh "docker login --username \$USERNAME --password \$PASSWORD https://docker.fuchicorp.com"
+            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "nexus-docker-creds", usernameVariable: 'docker_username', passwordVariable: 'docker_password']]) {
+              sh "docker login --username ${env.docker_username} --password ${env.docker_password} https://docker.fuchicorp.com"
             }
+
 
              // Push image to the Nexus with new release
               docker.withRegistry('https://docker.fuchicorp.com', 'nexus-docker-creds') {

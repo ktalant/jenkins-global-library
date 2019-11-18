@@ -113,6 +113,7 @@ def runPipeline() {
             try_num=0
             until ping -c1 docker.fuchicorp.com >/dev/null 2>&1;
             do
+              docker network prune
               sleep 3;
               try_num=$((\$try_num + 1))
               if [[ \$try_num == 3 ]]; then

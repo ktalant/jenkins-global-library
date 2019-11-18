@@ -110,8 +110,7 @@ def runPipeline() {
           stage('Push image') {
 
             sh '''#!/bin/bash -e
-            cat /etc/resolv.conf
-            docker network prune
+            echo "nameserver 8.8.8.8" >> /etc/resolv.conf
             try_num=0
             until ping -c1 docker.fuchicorp.com >/dev/null 2>&1;
             do

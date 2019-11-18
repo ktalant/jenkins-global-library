@@ -110,6 +110,7 @@ def runPipeline() {
           stage('Push image') {
 
             sh '''#!/bin/bash -e
+            cat /etc/resolv.conf
             docker network prune
             try_num=0
             until ping -c1 docker.fuchicorp.com >/dev/null 2>&1;

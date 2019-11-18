@@ -124,7 +124,18 @@ def runPipeline() {
                     dockerImage.push("latest")
                 }
               }
+
+
            }
+
+           stage("Clean up")
+
+           sh "docker rmi --no-prune docker.fuchicorp.com/${repositoryName}-${environment}:0.${BUILD_NUMBER}"
+           
+           if (params.PUSH_LATEST) {
+             sh "docker rmi --no-prune docker.fuchicorp.com/${repositoryName}-${environment}:latest"
+           }
+
          }
       }
     }

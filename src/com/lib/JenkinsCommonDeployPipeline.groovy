@@ -15,7 +15,7 @@ def runPipeline() {
   try {
     properties([ parameters([
       // This hard coded params should be configured inside code
-      choice(choices: ['dev,qa,prod'], description: 'Please select the environment to deploy ', name: 'deployment_environment'),
+      choice(choices: ['dev','qa','prod'], description: 'Please select the environment to deploy ', name: 'deployment_environment'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraform_apply'),
       booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraform_destroy'),
       text(name: 'deployment_tfvars', defaultValue: 'extra_values = "tools"', description: 'terraform configuration')

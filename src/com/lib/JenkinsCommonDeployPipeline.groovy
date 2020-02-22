@@ -9,39 +9,15 @@ def runPipeline() {
   def environment = ""
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
   def k8slabel = "jenkins-pipeline-${UUID.randomUUID().toString()}"
-  def deploymentName = "${JOB_NAME}"
-                        .split('/')[0]
-                        .replace('-fuchicorp', '')
-                        .replace('-build', '')
-                        .replace('-deploy', '')
 
-  switch(branch) {
-    case 'master': environment = 'prod'
-    break
-
-    case 'qa': environment = 'qa'
-    break
-
-    case 'dev': environment = 'dev'
-    break
-
-    case 'tools': environment = 'tools'
-    break
-
-    default:
-        currentBuild.result = 'FAILURE'
-        print('This branch does not supported')
-  }
-
-  println("Branch: ${branch}")
-  println("Environment: ${environment}")
+  println("You are using branch: ${branch}")
 
   try {
     properties([ parameters([
       // This hard coded params should be configured inside code
+      choice(choices: ['dev,qa,prod'], description: 'Please select the environment to deploy ', name: 'deployment_environment'),
       booleanParam(defaultValue: false, description: 'Apply All Changes', name: 'terraform_apply'),
       booleanParam(defaultValue: false, description: 'Destroy deployment', name: 'terraform_destroy'),
-      choice(name: 'selectedDockerImage', choices: common_docker.findDockerImages(deploymentName + '-' + environment), description: 'Please select docker image to deploy!'),
       text(name: 'deployment_tfvars', defaultValue: 'extra_values = "tools"', description: 'terraform configuration')
       ]
       )])
@@ -109,7 +85,7 @@ def runPipeline() {
           }
 
           stage('Generate Configurations') {
-            // sh "sleep 200"
+            println("Environment: ${environment}")
             sh """
             mkdir -p ${WORKSPACE}/deployments/terraform/
             cat  /etc/secrets/service-account/credentials.json > ${WORKSPACE}/deployments/terraform/fuchicorp-service-account.json
@@ -119,15 +95,13 @@ def runPipeline() {
             """
             // sh /scripts/Dockerfile/set-config.sh Should go to Docker container CMD so we do not have to call on slave 
             deployment_tfvars += """
-            deployment_name        = \"${deploymentName}\"
-            deployment_environment = \"${environment}\"
-            deployment_image       = \"docker.fuchicorp.com/${selectedDockerImage}\"
+            deployment_environment = \"${deployment_environment}\"
             credentials            = \"./fuchicorp-service-account.json\"
             """.stripIndent()
 
-            writeFile(
-              [file: "${WORKSPACE}/deployments/terraform/deployment_configuration.tfvars", text: "${deployment_tfvars}"]
-              )
+            writeFile([
+              file: "${WORKSPACE}/deployments/terraform/deployment_configuration.tfvars", text: "${deployment_tfvars}"
+              ])
 
               sh "cat ${WORKSPACE}/deployments/terraform/deployment_configuration.tfvars"
           }
